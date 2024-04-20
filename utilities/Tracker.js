@@ -208,12 +208,15 @@ const Tracker = (function () {
 
   class Trackable {
     constructor(tracker, landmarkCount, createLandmark) {
+     
+
       this.tracker = tracker
 
       this.idNumber = trackableCount++;
       this.idColor = [(this.idNumber * 73) % 360, 100, 50];
       this.isActive = false;
 
+      this.boundingBox = [new Vector2D(0,0),new Vector2D(0,0)]
 
     // Create the landmarks
       this.landmarks = Array.from(
@@ -261,6 +264,19 @@ const Tracker = (function () {
 
     }
 
+    get w() {
+      return this.boundingBox[1].x - this.boundingBox[0].x
+    }
+    get h() {
+      return this.boundingBox[1].y - this.boundingBox[0].y
+    }
+
+    get x() {
+      return this.boundingBox[0].x 
+    }
+    get y() {
+      return this.boundingBox[0].y 
+    }
     get flatStringData() {
       return this.flatData.map(s => s.toFixed(2)).join(",")
     }
@@ -326,6 +342,24 @@ const Tracker = (function () {
       // Landmarks are relative to the image size
         p.circle(pt.x, pt.y, 6);
       });
+    }
+
+    calculateMetaTrackingData() {
+      if (this.isActive) {
+
+        this.boundingBox[0].setTo(999999,999999)
+        this.boundingBox[1].setTo(-999999,-999999)
+
+        this.landmarks.forEach(lmk => {
+          // console.log(lmk.x, lmk.y)
+          this.boundingBox[0].x = Math.min(this.boundingBox[0].x, lmk.x)
+          this.boundingBox[0].y = Math.min(this.boundingBox[0].y, lmk.y)
+          this.boundingBox[1].x = Math.max(this.boundingBox[1].x, lmk.x)
+          this.boundingBox[1].y = Math.max(this.boundingBox[1].y, lmk.y)
+        })
+        // console.log(this.boundingBox[0].toFixed(2), this.boundingBox[1].toFixed(2))
+
+      }
     }
 
 
@@ -464,6 +498,7 @@ const Tracker = (function () {
 
   // Do meta calculations
     calculateMetaTrackingData() {
+      super.calculateMetaTrackingData()
 
       const setToLandmark = (v, index) => {
         setTo(v, this.landmarks[index])
@@ -517,7 +552,7 @@ const Tracker = (function () {
     }
 
     calculateMetaTrackingData() {
-
+      super.calculateMetaTrackingData()
     }
   }
 
@@ -550,6 +585,7 @@ const Tracker = (function () {
     }
 
     calculateMetaTrackingData() {
+      super.calculateMetaTrackingData()
     // console.log("hand data")
       this.fingers.forEach((finger,index) => {
 

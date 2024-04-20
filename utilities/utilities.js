@@ -1,6 +1,33 @@
 // Utilities
 
 
+// function circleCutout(p) {
+//     clippingMask.loadPixels()
+
+//         let w = clippingMask.width
+//         let h = clippingMask.width
+//         for (var i = 0; i < clippingMask.width; i++) {
+//         for (var j = 0; j < clippingMask.height; j++) {
+//           let dx = i/clippingMask.width
+
+//         }
+//         }
+//     clippingMask.updatePixels()
+// }
+
+// function transparentSlice(p, source, x, y, scale) {
+//     // Take a slice of this image at a location
+//     p.push()
+//     p.translate(p.width, 0)
+//     p.scale(-1, 1)
+
+//     // Draw the source image offset
+//     p.scale(scale, scale)
+//     p.translate(-x, -y)
+//     p.image(source, 0, 0)
+//     p.pop()
+// }
+
 // Useful fxns
 function remap(v, v0, v1, nv0, nv1) {
     let pct = (v - v0)/(v1 - v0)
