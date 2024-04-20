@@ -563,9 +563,9 @@ const Tracker = (function () {
     constructor({
       maxHistory=  10,
       captureDim= [320, 240],
-      maxNumHands= 6,
-      maxNumPoses= 3,
-      maxNumFaces= 3,
+      maxNumHands= 10,
+      maxNumPoses= 5,
+      maxNumFaces= 5,
       doAcquireFaceMetrics=false,
       doAcquirePoseMetrics=false,
       doAcquireHandMetrics=false,
@@ -626,7 +626,7 @@ const Tracker = (function () {
       this.afterDetectFxns.push(fxn)
     }
 
-    drawDebugData(p) {
+    drawCapture(p) {
       if (this.capture) {
         p.push()
         p.translate(this.captureDim[0], 0)
@@ -635,6 +635,10 @@ const Tracker = (function () {
         p.image(this.capture, 0,0, ...this.captureDim)
         p.pop()
       }
+    }
+
+    drawDebugData(p) {
+      
 
       this.faces.forEach((face) => {
         if (face.isActive) face.drawDebugData(p);

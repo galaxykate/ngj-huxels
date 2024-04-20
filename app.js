@@ -29,11 +29,12 @@ let app = {
   time:new HeartBeatTime({loopOver: 3}),
   debugOptions: {
     speed: 1,
-    showTrackerDebug: false,
+    showTrackerLandmarks: false,
+    showTrackerCamera: false,
     mode: "test"
   },
   debugOptionsOptions: {
-    mode: ["test", "foo", "bar"]
+    mode: ["test", "tetris", "fish"]
   }
 }
 
@@ -43,6 +44,8 @@ let MODES = {}
 
 document.addEventListener("DOMContentLoaded", (event) => {
   console.log("DOM fully loaded and parsed");
+
+  app.debugOptionsOptions.mode = Object.keys(MODES)
 
   new Vue({
     template: `<div id="app">
@@ -123,20 +126,26 @@ document.addEventListener("DOMContentLoaded", (event) => {
         };
 
         p.draw = () => {
+
           
           this.time.update()
           // Try to detect faces, hands, poses
           app.tracker.detect()
 
-          if (app.debugOptions.showTrackerDebug)
-            app.tracker.drawDebugData(p)
+          
 
           /**
            * Custom mode behavior
            **/
           this.mode.update(app)
           this.mode.drawBackground(app)
-          this.huxels.forEach(h => h.draw(app))
+
+          if (app.debugOptions.showTrackerLandmarks)
+            app.tracker.drawDebugData(p)
+          if (app.debugOptions.showTrackerCamera)
+            app.tracker.drawCapture(p)
+
+          // this.huxels.forEach(h => h.draw(app))
           this.mode.draw(app)
 
 
