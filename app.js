@@ -134,8 +134,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
           // p.endShape()
 
+          console.log(app.tracker.poses)
+
           app.tracker.faces.forEach(face => {
-            console.log(face)
+            // console.log(face)
             
             // // Draw nose
             // p.fill(0, 100, 50)
@@ -146,26 +148,26 @@ document.addEventListener("DOMContentLoaded", (event) => {
             // p.text("💖", ...face.nose)
 
             // Draw glasses
-            face.side.forEach(side => {
-              // do something on this side
+            // face.side.forEach(side => {
+            //   // do something on this side
 
-              // get a list of points around the eye
-              let ringPts = side.eyeRings[0]
-              let innerPts = side.eyeRings[4]
-              p.fill(320, 100, 0)
-              p.beginShape()
-              ringPts.forEach(pt => {
-                p.vertex(...pt)
-              })
-              p.endShape()
+            //   // get a list of points around the eye
+            //   let ringPts = side.eyeRings[0]
+            //   let innerPts = side.eyeRings[4]
+            //   p.fill(320, 100, 0)
+            //   p.beginShape()
+            //   ringPts.forEach(pt => {
+            //     p.vertex(...pt)
+            //   })
+            //   p.endShape()
 
-              p.fill(320, 100, 100)
-              p.beginShape()
-              innerPts.forEach(pt => {
-                p.vertex(...pt)
-              })
-              p.endShape()
-            })
+            //   p.fill(320, 100, 100)
+            //   p.beginShape()
+            //   innerPts.forEach(pt => {
+            //     p.vertex(...pt)
+            //   })
+            //   p.endShape()
+            // })
 
           })
 

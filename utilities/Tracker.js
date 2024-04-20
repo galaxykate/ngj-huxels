@@ -8,6 +8,7 @@ const Tracker = (function () {
 
   const FACE_LANDMARK_COUNT = 478;
   const HAND_LANDMARK_COUNT = 21;
+  const POSE_LANDMARK_COUNT = 32;
 
   function magnitude(v) {
     return Math.sqrt(v.x*v.x + v.y*v.y + v.z*v.z )
@@ -200,62 +201,6 @@ const Tracker = (function () {
       );
   }
 
-  function convertFrame({ scaleX, scaleY, offsetX, offsetY, frame }) {
-    let fields = ["hands", "faces", "bodies"]
-    fields.forEach(key => {
-      if (frame[key]){
-        frame[key].forEach((pts) => {
-          pts.forEach((pt) => {
-            pt[0] = pt[0] * scaleX + offsetX;
-            pt[1] = pt[1] * scaleY + offsetY;
-          });
-        });
-      }
-    })
-
-  }
-
-  function convertFromOGRecording() {
-  //TEST_FACE_DATA array of frames
-  //TEST_HAND_DATA array of frames
-    console.log(TEST_FACE_DATA.length);
-
-    function convertPts(pt) {
-      (pt[0] = pt[0] * 1.2 + 300), (pt[1] = pt[1] * 200);
-    }
-
-  // Make a set of frames
-    let frames = [];
-    for (var i = 0; i < TEST_FACE_DATA.length; i++) {
-      let hands = TEST_HAND_DATA[i];
-      let face = TEST_FACE_DATA[i];
-    // Filter out empty faces/hands
-      hands = hands.filter((hand) =>
-        hand.some((pt) => pt[0] !== 0 || pt[1] !== 0)
-        );
-
-      let frame = {
-        index: i,
-        hands,
-        faces: [face],
-      }
-      convertFrame({frame, scaleX:1.2, scaleY: 1, offsetX:300, offsetY: 200})
-      frames.push(frame);
-    }
-
-    frames.forEach((fr) => printFrameInfo(fr));
-
-    saveTemplateAsFile("testData.json", {
-      name: "test recording",
-      label: "",
-      timestamp: Date.now(),
-      frames
-    });
-
-
-  //   landmarks[index][0] * scale * 1.2 + 300,
-  // 	landmarks[index][1] * scale + 200
-  }
 
 
   let trackableCount = 0;
@@ -343,22 +288,7 @@ const Tracker = (function () {
       return this.landmarks.map(tracker.vectorToData)
     }
 
-    contourToPoints(contour) {
-      return contour.map((index) => this.landmarks[index]);
-    }
-
-    setLandmarksFromRecording(landmarks) {
-      this.landmarks.forEach((pt, index) => {
-      // Scale and mirror the positions, so they are in screen space
-        let scale = 1;
-      // The new Golan version has 2 more points ¯\_(ツ)_/¯
-        if (index < landmarks.length) {
-          pt.setTo(landmarks[index][0] * scale, landmarks[index][1] * scale);
-        }
-      });
-      this.calculateMetaTrackingData?.();
-    }
-
+   
     setLandmarksFromTracker(landmarks, imageDimensions) {
     // console.log("set to landmarks", landmarks)
 
@@ -455,6 +385,13 @@ const Tracker = (function () {
     "noseSneerLeft",
     "noseSneerRight",
     ];
+
+  /*
+  ====================================================================================
+  
+  POSES
+  ====================================================================================
+  */
 
   class Face extends Trackable {
   // Data for one face
@@ -563,7 +500,33 @@ const Tracker = (function () {
 
     }
   }
+  /*
+  ====================================================================================
+  
+  POSES
+  ====================================================================================
+  */
+  class Pose extends Trackable {
+  // Data for one face
+    constructor(tracker, createLandmark) {
+      super(tracker, POSE_LANDMARK_COUNT, createLandmark);
+      this.name = "Pose" + this.idNumber
+      this.type = "pose"
+      this.tracker = tracker
 
+    }
+
+    calculateMetaTrackingData() {
+      
+    }
+  }
+
+  /*
+  ====================================================================================
+  
+  HANDS
+  ====================================================================================
+  */
   class Hand extends Trackable {
   // Data for one face
     constructor(tracker, createLandmark) {
@@ -601,7 +564,7 @@ const Tracker = (function () {
       maxHistory=  10,
       captureDim= [320, 240],
       maxNumHands= 6,
-      maxNumPoses= 1,
+      maxNumPoses= 3,
       maxNumFaces= 3,
       doAcquireFaceMetrics=false,
       doAcquirePoseMetrics=false,
@@ -650,6 +613,7 @@ const Tracker = (function () {
 
       this.faces = Array.from({length:maxNumFaces}, ()=> new Face(this, createLandmark))
       this.hands = Array.from({length:maxNumHands}, ()=> new Hand(this, createLandmark))
+      this.poses = Array.from({length:maxNumHands}, ()=> new Pose(this, createLandmark))
 
       this.afterDetectFxns = []
 
@@ -678,13 +642,18 @@ const Tracker = (function () {
       this.hands.forEach((hand) => {
         if (hand.isActive) hand.drawDebugData(p);
       });
+
+      this.poses.forEach((pose) => {
+        if (pose.isActive) pose.drawDebugData(p);
+      });
     }
 
 
     get activeTrackables() {
       return {
        faces:this.faces.filter((f) => f.isActive),
-       hands:this.hands.filter((f) => f.isActive)
+       hands:this.hands.filter((f) => f.isActive),
+       poses:this.poses.filter((f) => f.isActive)
      }
    }
 
@@ -739,36 +708,17 @@ const Tracker = (function () {
 
     this.initHandTracking();
     this.initFaceTracking();
-  // this.initPoseTracking();
+    this.initPoseTracking();
   }
 
-  
-
-  setToRecordingFrame(frame, ogAdjustment) {
-    if (frame.faces[0]) {
-      this.faces[0].isActive = true;
-      this.faces[0].setLandmarksFromRecording(frame.faces[0], ogAdjustment);
-    }
-
-    if (frame.hands[0]) {
-      this.hands[0].isActive = true;
-      this.hands[0].setLandmarksFromRecording(frame.hands[0], ogAdjustment);
-    }
-
-    if (frame.hands[1]) {
-      this.hands[1].isActive = true;
-      this.hands[1].setLandmarksFromRecording(frame.hands[1], ogAdjustment);
-    }
-
-    this.afterUpdate();
-  }
-
+ 
   async detect() {
     let t = performance.now();
     // Make sure we are not making double predictions?
     if (t - this.lastPredictionTime > 10) {
       this.predictFace();
       this.predictHand();
+      this.predictPose();
 
 
       this.afterDetect()
@@ -834,10 +784,30 @@ const Tracker = (function () {
 
   async predictPose() {
     let startTimeMs = performance.now();
-    this.poseLandmarks = this.poseLandmarker?.detectForVideo(
+    let data = this.poseLandmarker?.detectForVideo(
       this.video.elt,
       startTimeMs
       );
+
+    if (data) {
+      console.log(data)
+
+      // Set each pose to the right data
+      this.poses.forEach((pose, poseIndex) => {
+        let landmarks = data.landmarks[poseIndex];
+       
+        // Set the face to these landmarks
+        if (landmarks) {
+          pose.isActive = true;
+          let videoDimensions = [this.video.elt.width, this.video.elt.height];
+          pose.setLandmarksFromTracker(landmarks, videoDimensions);
+        } else {
+          // No pose active here
+          pose.isActive = false;
+        }
+      });
+    }
+
   }
 
   //------------------------------------------------------------------------
