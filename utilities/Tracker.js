@@ -536,6 +536,8 @@ const Tracker = (function () {
       this.handedness = undefined;
       this.tracker = tracker
 
+      this.center = new Vector2D()
+
       this.fingers = Array.from({length:5}, (x, i)=> {
         let joints = CONTOURS.fingers[i].map(index => this.landmarks[index])
         return {
@@ -553,7 +555,12 @@ const Tracker = (function () {
 
         setToDifference(finger.dir, finger.tip, finger.joints[2])
       })
+
+      let square = this.fingers.map(f => f.joints[0]).concat(this.fingers.map(f => f.joints[0]))
+      this.center.setToAverage(square)
     }
+
+
   }
 
 
