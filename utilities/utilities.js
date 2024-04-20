@@ -1,6 +1,35 @@
 // Utilities
 
 
+function makePixelsOutsideCircleTransparent(img, cx, cy, radius) {
+    console.log(img.width, img.height);
+    // Load the pixels array of the image
+    img.loadPixels();
+
+   
+    // Loop through all pixels
+    for (let i = 0; i < img.width; i++) {
+        for (let j = 0; j < img.height; j++) {
+            let x = i
+            let y = j
+            // Calculate distance from the center of the circle
+            let dx = x - cx;
+            let dy = y - cy;
+            let d = Math.sqrt(dx * dx + dy * dy);
+            let index = (x + y * img.width) * 4; // Get the pixel index
+            
+            // If the distance is greater than the radius, set alpha to 0 (transparent)
+            if (d > radius) {
+                img.pixels[index + 3] = 0; // Set alpha value to 0 (transparent)
+            }
+           
+        }
+    }
+
+    // Update the image with the modified pixels
+    img.updatePixels();
+}
+
 // function circleCutout(p) {
 //     clippingMask.loadPixels()
 
@@ -53,8 +82,8 @@ function randInt(min, max) {
   if (max === undefined) {
     max = min;
     min = 0;
-  }
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function lerp(c0, c1, pct) {
@@ -116,7 +145,7 @@ function map(x, y0, y1, z0, z1) {
 const saveTemplateAsFile = (filename, dataObjToWrite) => {
   const blob = new Blob([JSON.stringify(dataObjToWrite)], {
     type: "text/json",
-  });
+});
   const link = document.createElement("a");
 
   link.download = filename;
@@ -127,7 +156,7 @@ const saveTemplateAsFile = (filename, dataObjToWrite) => {
     view: window,
     bubbles: true,
     cancelable: true,
-  });
+});
 
   link.dispatchEvent(evt);
   link.remove();
@@ -150,19 +179,19 @@ function oneHot(count, index) {
 function indexOfMax(arr) {
   if (arr.length === 0) {
     return -1;
-  }
+}
 
-  var max = arr[0];
-  var maxIndex = 0;
+var max = arr[0];
+var maxIndex = 0;
 
-  for (var i = 1; i < arr.length; i++) {
+for (var i = 1; i < arr.length; i++) {
     if (arr[i] > max) {
       maxIndex = i;
       max = arr[i];
-    }
   }
+}
 
-  return maxIndex;
+return maxIndex;
 }
 
 function predictionToClassification(labels, rawPrediction) {
@@ -170,17 +199,17 @@ function predictionToClassification(labels, rawPrediction) {
   let classification = {
     scoresByLabel: {},
     sorted: [],
-  };
+};
 
-  rawPrediction.forEach((option, index) => {
+rawPrediction.forEach((option, index) => {
     let label = labels[index];
     classification.scoresByLabel[label] = option.value;
     classification.sorted.push({
       label,
       score: option.value,
-    });
   });
-  classification.sorted.sort((a, b) => b.score - a.score);
-  classification.winner = classification.sorted[0]
-  return classification
+});
+classification.sorted.sort((a, b) => b.score - a.score);
+classification.winner = classification.sorted[0]
+return classification
 }

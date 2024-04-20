@@ -112,12 +112,24 @@ document.addEventListener("DOMContentLoaded", (event) => {
         }
       })
 
+
+
+
       // Create a p5 object for whatever
       new p5((p) => {
 
         app.p = p
 
         let clippingMask = p.createGraphics(app.faceThumbnailSize,app.faceThumbnailSize)
+       
+
+        // Make graphics for each face
+        this.tracker.faces.forEach(f => {
+          let img = p.createGraphics(app.faceThumbnailSize,app.faceThumbnailSize)
+          f.thumbnail = img
+
+          img.pixelDensity(1);
+        })
 
         this.mouse.addWindow({
           id:"main",
@@ -163,11 +175,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
           this.mode.draw(app) 
 
           
-          let x = this.tracker.faces[0]
-          let y = 200
-
-          let h = 200
-          let w = 200
+          
           let src = this.tracker.capture
           
           // transparentSlice(clippingMask, this.tracker.capture, x,y, 1)
@@ -175,31 +183,50 @@ document.addEventListener("DOMContentLoaded", (event) => {
           p.noFill()
           // p.rect(x, y, w, h)
 
-          this.tracker.faces.forEach(f => {
-            p.rect(f.x, f.y, f.w, f.h)
+          // Update all the thumbnails
+          this.tracker.faces.forEach((f,index) => {
+            if (f.isActive) {
+              p.rect(f.x, f.y, f.w, f.h)
+
+              // Bit of a border
+              let x = f.x - 40
+              let y = f.y - 20
+              let h = f.h*1.2
+
+              let thumbH = app.faceThumbnailSize
+              let img = f.thumbnail
+              img.push()
+
+              let scale0 = thumbH/h
+              let scale1 = this.tracker.scale*thumbH/h
+              // console.log(scale0, scale1)
+
+              img.scale(scale1, scale1)
+              img.translate(-x/this.tracker.scale, -y/this.tracker.scale)
+
+              // Draw flipped source
+              img.translate(src.width, 0)
+              img.scale(-1, 1)
+              img.image(src, 0, 0)
+              img.pop()
+
+              makePixelsOutsideCircleTransparent(img, thumbH/2, thumbH/2, thumbH/2)
+            }
           })
 
-          // clippingMask.push()
 
-          // let scale0 = app.faceThumbnailSize/w
-          // let scale1 = this.tracker.scale*app.faceThumbnailSize/w
-          // // console.log(scale0, scale1)
 
-          // clippingMask.scale(scale1, scale1)
-          // clippingMask.translate(-x/this.tracker.scale, -y/this.tracker.scale)
+          // clippingMask.loadPixels()
 
-          // // Draw flipped source
-          // clippingMask.translate(src.width, 0)
-          // clippingMask.scale(-1, 1)
-          // clippingMask.image(src, 0, 0)
-          // clippingMask.pop()
+
+          // clippingMask.updatePixels()
 
 
 
           // The clipping mask is W,H
           // We want to get an image of x
 
-          // p.image(clippingMask, 0, 0)
+          p.image(clippingMask, 0, 0)
 
 
          

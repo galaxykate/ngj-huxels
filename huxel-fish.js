@@ -21,37 +21,25 @@ MODES.fish = {
 	},
 
 	draw({p, tracker, huxels, time, particles, debugOptions}) {
-		// Tracker is where all the hands, faces, and poses live
+		
+          tracker.faces.forEach((f,index) => {
+            p.image(f.thumbnail, 100*index, 0)
+          })
 
-		tracker.hands.forEach(hand => {
-			if (hand.isActive) {
-				
-				hand.fingers.forEach(finger => {
-					// p is the processing instance
-					p.fill(320, 100, 50)
-					// draw Vector2d(processing instance, radius)
-					finger.tip.draw(p, 10)
+          tracker.hands.forEach((h,index) => {
+            let faceIndex = 0
+            let face = tracker.faces[faceIndex]
+            // console.log(index, face)
+            h.fingers.forEach(f => {
+                p.push()
+              p.translate(...f.tip) 
+              p.image(face.thumbnail, 0, 0)
+              p.pop()
+            })
+            
+          
+          })
 
-					p.text("💖", finger.tip.x, finger.tip.y)
-					// p.text("💖", ...finger.tip)
-				})
-			}
-		})
-
-
-		tracker.faces.forEach(face => {
-			if (face.isActive) {
-				// console.log(face)
-
-				face.side.forEach(side  => {
-					let eyePos = side.irisCenter
-					p.fill(320, 100, 0)
-					eyePos.draw(p, 10)
-
-				})
-				
-			}
-		})
 
 	},
 	
