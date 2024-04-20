@@ -1,10 +1,10 @@
 MODES.fish = {
 	start({}) {
-
+		console.log("START FISH")
 	},
 
 	stop({}) {
-
+		console.log("STOP FISH")
 	},
 
 	update({p, tracker, huxels, time, particles, debugOptions}) {
@@ -41,7 +41,7 @@ MODES.fish = {
 
 		tracker.faces.forEach(face => {
 			if (face.isActive) {
-				console.log(face)
+				// console.log(face)
 
 				face.side.forEach(side  => {
 					let eyePos = side.irisCenter

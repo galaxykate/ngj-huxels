@@ -13,7 +13,7 @@ const Tracker = (function () {
   function magnitude(v) {
     return Math.sqrt(v.x*v.x + v.y*v.y + v.z*v.z )
   }
-  
+
   function setTo(v, v2) {
     v.x = v2.x
     v.y = v2.y
@@ -41,7 +41,7 @@ const Tracker = (function () {
     v.z /= vs.length
   }
 
-  // Individual lists of 
+  // Individual lists of
   const CONTOURS = {
     fingers: [
       [1, 2, 3, 4],
@@ -227,7 +227,7 @@ const Tracker = (function () {
             return lmk
           }
           return {
-            x:0,y:0,z:0, 
+            x:0,y:0,z:0,
             index:i,
             history: []
           }
@@ -252,13 +252,13 @@ const Tracker = (function () {
       let dim = this.dimensionality
       let count = data.length/dim
       this.landmarks.forEach((lmk,index) => {
-          let arr = data.slice(index*dim, (index+1)*dim) 
+          let arr = data.slice(index*dim, (index+1)*dim)
           // arr[0] += 20
           lmk.setTo(arr)
           // if (this.isActive)
           //   console.log(arr)
       })
-  
+
     }
 
     get flatStringData() {
@@ -283,12 +283,12 @@ const Tracker = (function () {
     toData(indices) {
 
     // Just some indices
-      if (indices) 
+      if (indices)
         return indices.map((index) => this.landmarks[index].map(tracker.vectorToData))
       return this.landmarks.map(tracker.vectorToData)
     }
 
-   
+
     setLandmarksFromTracker(landmarks, imageDimensions) {
     // console.log("set to landmarks", landmarks)
 
@@ -306,7 +306,7 @@ const Tracker = (function () {
 
       this.landmarks.concat(this.metaVectors).forEach(v => {
        v.history.unshift({
-        x: v.x, 
+        x: v.x,
         y: v.y,
         z: v.z
       })
@@ -328,7 +328,7 @@ const Tracker = (function () {
       });
     }
 
-   
+
   }
 
   const CATEGORIES = [
@@ -388,7 +388,7 @@ const Tracker = (function () {
 
   /*
   ====================================================================================
-  
+
   POSES
   ====================================================================================
   */
@@ -483,7 +483,7 @@ const Tracker = (function () {
         let eyeContour = CONTOURS.sides[i].eyeRings[4];
 
         setToAverage(side.eyeCenter, [side.eyeOuter, side.eyeInner])
-        
+
 
         setToDifference(side.eyeDirOut, side.eyeOuter, side.eyeInner)
         setToDifference(side.eyeDirUp, side.eyeTop, side.eyeBottom)
@@ -502,7 +502,7 @@ const Tracker = (function () {
   }
   /*
   ====================================================================================
-  
+
   POSES
   ====================================================================================
   */
@@ -517,13 +517,13 @@ const Tracker = (function () {
     }
 
     calculateMetaTrackingData() {
-      
+
     }
   }
 
   /*
   ====================================================================================
-  
+
   HANDS
   ====================================================================================
   */
@@ -546,7 +546,7 @@ const Tracker = (function () {
           tip: joints[joints.length - 1]
         }
 
-      }) 
+      })
     }
 
     calculateMetaTrackingData() {
@@ -635,19 +635,23 @@ const Tracker = (function () {
       this.afterDetectFxns.push(fxn)
     }
 
-    drawCapture(p) {
+    drawCapture(p, x = 0, y = 0, scale = 1.0) {
       if (this.capture) {
+        p.push()
+        p.translate(x, y)
+        p.scale(scale)
         p.push()
         p.translate(this.captureDim[0], 0)
         p.scale(-1, 1)
 
         p.image(this.capture, 0,0, ...this.captureDim)
         p.pop()
+        p.pop()
       }
     }
 
     drawDebugData(p) {
-      
+
 
       this.faces.forEach((face) => {
         if (face.isActive) face.drawDebugData(p);
@@ -686,7 +690,7 @@ const Tracker = (function () {
 
       if (this.capture.elt.width > 0) {
       // WE HAVE A CAPTURE
-      // If the condition is met, stop the loop 
+      // If the condition is met, stop the loop
 
         clearInterval(intervalId);
         console.log("Condition met, stopping loop.");
@@ -696,7 +700,7 @@ const Tracker = (function () {
 
       // NOW start tracking
         this.initTracking();
-      } 
+      }
 
       else if (count >= maxCount) {
       // If 100 iterations have occurred without meeting the condition, stop the loop
@@ -724,7 +728,7 @@ const Tracker = (function () {
     this.initPoseTracking();
   }
 
- 
+
   async detect() {
     let t = performance.now();
     // Make sure we are not making double predictions?
@@ -803,11 +807,11 @@ const Tracker = (function () {
       );
 
     if (data) {
-     
+
       // Set each pose to the right data
       this.poses.forEach((pose, poseIndex) => {
         let landmarks = data.landmarks[poseIndex];
-       
+
         // Set the face to these landmarks
         if (landmarks) {
           pose.isActive = true;
