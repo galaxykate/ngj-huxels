@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
       <heartbeat-time :time="time"  v-if="false" />
 
       <flag-tracker :obj="debugOptions" id="debugOptions" :options="debugOptionsOptions"/>
-      
+
       <div style="width:150px;height:100px;border:2px solid blue;overflow:scroll">
         <div v-for="hux in huxels">
           {{hux}}
@@ -69,8 +69,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
 
     </div>
-    
-    
+
+
 
     </div>`,
 
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         if (Math.random() > .9) {
 
         }
-      },  
+      },
     },
 
     computed: {
@@ -93,7 +93,19 @@ document.addEventListener("DOMContentLoaded", (event) => {
     },
 
     watch: {
-
+      debugOptions: {
+        handler(val, old) {
+          // if (old) {
+          //   console.log("Old object is: ", old.mode)
+          //   MODES[old.mode].stop(this)
+          // }
+          if (val) {
+            console.log("New object is: ", val.mode)
+            MODES[val.mode].start(this)
+          }
+        },
+        deep: true
+      }
     },
 
     mounted() {
@@ -101,18 +113,18 @@ document.addEventListener("DOMContentLoaded", (event) => {
       initMidi({
         onKeyUp: (note,velocity) => {
         console.log("UP", note, velocity)
-        }, 
+        },
         onKeyDown: (note,velocity) => {
            console.log("DOWN", note, velocity)
-        }, 
+        },
         onFader: (id, val) => {
           console.log("FADER", id, val)
         }
-      }) 
+      })
 
       // Create a p5 object for whatever
       new p5((p) => {
-      
+
         app.p = p
 
         this.mouse.addWindow({
@@ -131,12 +143,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
         p.draw = () => {
           p.background(190, 100, 90)
-          
+
           this.time.update()
           // Try to detect faces, hands, poses
           app.tracker.detect()
 
-          
+
 
           /**
            * Custom mode behavior
@@ -150,10 +162,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
              app.tracker.drawCapture(p)
              p.pop()
            }
-           
+
           if (app.debugOptions.showTrackerLandmarks)
             app.tracker.drawDebugData(p)
-         
+
 
           // this.huxels.forEach(h => h.draw(app))
           this.mode.draw(app)
