@@ -2,7 +2,7 @@
 
 
 function makePixelsOutsideCircleTransparent(img, cx, cy, radius) {
-    console.log(img.width, img.height);
+    // console.log(img.width, img.height);
     // Load the pixels array of the image
     img.loadPixels();
 
