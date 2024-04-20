@@ -39,7 +39,22 @@ class Timer {
 	}
 }
 
+const BLOCK = {
+	blueFill: [203, 49, 92],
+	blueBorder: [200, 49, 66],
+	weight: 6,
+	rounding: 5,
 
+	draw(p, x, y, w, h) {
+		p.push();
+		p.fill(...this.blueFill);
+		p.stroke(...this.blueBorder);
+		p.strokeWeight(this.weight);
+		halfWeight = this.weight / 2;
+		p.rect(x + halfWeight, y + halfWeight, w - this.weight, h - this.weight, this.rounding);
+		p.pop();
+	}
+}
 
 MODES.tetris = {
 	state: {
@@ -47,20 +62,75 @@ MODES.tetris = {
 		cols: 10,
 		board: [],
 		updateTimer: new Timer(500, (timer) => {
-			this.updateActive()
+			MODES.tetris.state.active.update();
 		}, true),
-		active: {
+		active: null
+	},
+
+	newActive() {
+		const that = this;
+		this.state.active = {
 			x: 0,
-			y: 0,
-			shape: [],
+			y: that.state.rows,
+			shape: that.getShape(),
+			rows() {
+				// Just because of rendering (Only used there)
+				return this.shape.length - 1;
+			},
 			translate(x, y) {
 				this.x += x;
 				this.y += y;
 			},
-			isDown: () => this.shape.some((row, i) => {
-				row.some((cell, j) => cell && MODES.tetris.state.board[this.y + i - 1][this.x + j])
-			})
+			isDown() {
+				return this.shape.some((row, i) => {
+					y = this.y + i;
+					return y < 1 || row.some((cell, j) => cell && y < that.state.rows && that.state.board[y - 1][this.x + j]);
+				});
+			},
+			update() {
+				this.translate(0, -1);
+				if (this.isDown()) {
+					this.shape.forEach((row, i) => {
+						row.forEach((cell, j) => {
+							if (cell) {
+								// This is where it crashes on loss.. So fix this later
+								that.state.board[this.y + i][this.x + j] = true;
+							}
+						})
+					});
+					that.newActive();
+				}
+			}
 		}
+	},
+
+	getShape() {
+		const shape = [];
+		const cols = this.state.cols;
+		const rows = 4;
+		const trueCount = 4;
+
+		for (let i = 0; i < rows; i++) {
+			const row = Array(cols).fill(false);
+			shape.push(row);
+		}
+
+		let count = 0;
+		while (count < trueCount) {
+			const randomRow = Math.floor(Math.random() * rows);
+			const randomCol = Math.floor(Math.random() * cols);
+
+			if (!shape[randomRow][randomCol]) {
+				shape[randomRow][randomCol] = true;
+				count++;
+			}
+		}
+
+		while (!shape[0].some((cell) => cell)) {
+			shape.push(shape.shift());
+		}
+
+		return shape;
 	},
 
 	setupBoard() {
@@ -68,9 +138,12 @@ MODES.tetris = {
 		this.state.board = [...new Array(rows).keys()].map(() => [...new Array(cols).keys()].map(() => false))
 	},
 
-	start({}) {
+	start({p}) {
 		if (this.state.board.length === 0) {
-			this.setupBoard()
+			this.setupBoard();
+		}
+		if (!this.state.active) {
+			this.newActive();
 		}
 	},
 
@@ -79,12 +152,14 @@ MODES.tetris = {
 	},
 
 	update({p, tracker, huxels, time, particles, debugOptions}) {
-		if (Math.random() > .9) {
-			let x = randInt(0, this.state.cols - 1)
-			let y = randInt(0, this.state.rows - 1)
-			huxels.push(new Huxel(x, y))
-			this.state.board[y][x] = true;
-		}
+		this.state.updateTimer.update(time.dt);
+
+		// if (Math.random() > .9) {
+		// 	let x = randInt(0, this.state.cols - 1)
+		// 	let y = randInt(0, this.state.rows - 1)
+		// 	huxels.push(new Huxel(x, y))
+		// 	this.state.board[y][x] = true;
+		// }
 	},
 
 	drawBackground({p, tracker, huxels, time, particles, debugOptions}) {
@@ -96,8 +171,8 @@ MODES.tetris = {
 		// p.fill(300, 80, 50)
 		p.circle(0, 0, 500)
 
-		tracker.drawCapture(p, 0, 0, 1.5);
-		this.drawGameArea(app, {x: 500, y: 0, w: 350, h: 700})
+		tracker.drawCapture(p, 0, 0, tracker.scale);
+		this.drawGameArea(app, {x: 700, y: 0, w: 350, h: 700})
 	},
 
 	drawGameArea({p, tracker, huxels, time, particles, debugOptions}, {x, y, w, h}) {
@@ -105,16 +180,34 @@ MODES.tetris = {
 		p.translate(x, y);
 		p.fill(0, 0, 0);
 		p.rect(0, 0, w, h);
-		huxelSize = [w / this.state.cols, h / this.state.rows];
+		const huxelSize = [w / this.state.cols, h / this.state.rows];
+		const rows = this.state.rows - 1;
+		//const cols = this.state.cols;
 
+		p.push();
 		this.state.board.forEach((row, i) => {
 			row.forEach((cell, j) => {
 				if (cell) {
-					p.fill(0, 0, 100)
-					p.rect(j * huxelSize[0], i * huxelSize[1], ...huxelSize);
+					BLOCK.draw(p, j * huxelSize[0], (rows - i) * huxelSize[1], ...huxelSize);
+					// p.fill(0, 0, 100)
+					// p.rect(j * huxelSize[0], (rows - i) * huxelSize[1], ...huxelSize);
 				}
 			})
 		})
-		p.pop()
+		p.pop();
+		const active = this.state.active;
+		p.push();
+		p.translate(active.x * huxelSize[0], (rows - active.rows() - active.y) * huxelSize[1]);
+		active.shape.forEach((row, i) => {
+			row.forEach((cell, j) => {
+				if (cell && i + active.y >= 0 && j + active.x >= 0 && i + active.y < this.state.rows && j + active.x < this.state.cols) {
+					BLOCK.draw(p, j * huxelSize[0], (active.rows() - i) * huxelSize[1], ...huxelSize);
+					// p.fill(139, 100, 100)
+					// p.rect(j * huxelSize[0], (active.rows() - i) * huxelSize[1], ...huxelSize);
+				}
+			})
+		})
+		p.pop();
+		p.pop();
 	}
 }

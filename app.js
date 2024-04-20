@@ -13,6 +13,7 @@
 let app = {
   hWidth: 100,
   hHeight: 100,
+  faceThumbnailSize: 80,
   p: undefined,
   tracker:new Tracker({
     mediapipePath:"/mediapipe/",
@@ -111,12 +112,24 @@ document.addEventListener("DOMContentLoaded", (event) => {
         }
       })
 
+
+
+
       // Create a p5 object for whatever
       new p5((p) => {
 
         app.p = p
 
-        let clippingMask = p.createGraphics(200,200)
+        let clippingMask = p.createGraphics(app.faceThumbnailSize,app.faceThumbnailSize)
+       
+
+        // Make graphics for each face
+        this.tracker.faces.forEach(f => {
+          let img = p.createGraphics(app.faceThumbnailSize,app.faceThumbnailSize)
+          f.thumbnail = img
+
+          img.pixelDensity(1);
+        })
 
         this.mouse.addWindow({
           id:"main",
@@ -159,11 +172,62 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
 
           // this.huxels.forEach(h => h.draw(app))
-          this.mode.draw(app)
+          this.mode.draw(app) 
 
-          // clippingMask.background(0)
-          // clippingMask.circle(0,0, 300)
-          // p.image(clippingMask, 0, 0)
+          
+          
+          let src = this.tracker.capture
+          
+          // transparentSlice(clippingMask, this.tracker.capture, x,y, 1)
+          p.stroke(320, 100, 50)
+          p.noFill()
+          // p.rect(x, y, w, h)
+
+          // Update all the thumbnails
+          this.tracker.faces.forEach((f,index) => {
+            if (f.isActive) {
+              p.rect(f.x, f.y, f.w, f.h)
+
+              // Bit of a border
+              let x = f.x - 40
+              let y = f.y - 20
+              let h = f.h*1.2
+
+              let thumbH = app.faceThumbnailSize
+              let img = f.thumbnail
+              img.push()
+
+              let scale0 = thumbH/h
+              let scale1 = this.tracker.scale*thumbH/h
+              // console.log(scale0, scale1)
+
+              img.scale(scale1, scale1)
+              img.translate(-x/this.tracker.scale, -y/this.tracker.scale)
+
+              // Draw flipped source
+              img.translate(src.width, 0)
+              img.scale(-1, 1)
+              img.image(src, 0, 0)
+              img.pop()
+
+              makePixelsOutsideCircleTransparent(img, thumbH/2, thumbH/2, thumbH/2)
+            }
+          })
+
+
+
+          // clippingMask.loadPixels()
+
+
+          // clippingMask.updatePixels()
+
+
+
+          // The clipping mask is W,H
+          // We want to get an image of x
+
+          p.image(clippingMask, 0, 0)
+
 
          
 
