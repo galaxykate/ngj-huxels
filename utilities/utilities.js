@@ -22,6 +22,14 @@ let noise = (() => {
     }
 })()
 
+function randInt(min, max) {
+  if (max === undefined) {
+    max = min;
+    min = 0;
+  }
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function lerp(c0, c1, pct) {
     return c0 + pct*(c1 - c0)
 }

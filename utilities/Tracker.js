@@ -790,8 +790,7 @@ const Tracker = (function () {
       );
 
     if (data) {
-      console.log(data)
-
+     
       // Set each pose to the right data
       this.poses.forEach((pose, poseIndex) => {
         let landmarks = data.landmarks[poseIndex];

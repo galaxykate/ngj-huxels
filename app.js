@@ -9,6 +9,9 @@
 
 
 let app = {
+  hWidth: 100,
+  hHeight: 100,
+  p: undefined,
   tracker:new Tracker({
     mediapipePath:"/mediapipe/",
     // handLandmarkerPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/",
@@ -22,8 +25,7 @@ let app = {
     }
   }),
   mouse: new DraggableMouse(),
-  points: [],
-  envelopes: [],
+  huxels: [],
   time:new HeartBeatTime({loopOver: 3}),
   debugOptions: {
     speed: 1,
@@ -35,6 +37,8 @@ let app = {
   }
 }
 
+
+let MODES = {}
 
 
 document.addEventListener("DOMContentLoaded", (event) => {
@@ -51,6 +55,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
       <heartbeat-time :time="time"  v-if="false" />
 
       <flag-tracker :obj="debugOptions" id="debugOptions" :options="debugOptionsOptions"/>
+      
+      <div style="width:150px;height:100px;border:2px solid blue;overflow:scroll">
+        <div v-for="hux in huxels">
+          {{hux}}
+        </div>
+      </div>
     </div>
     
     
@@ -58,12 +68,20 @@ document.addEventListener("DOMContentLoaded", (event) => {
     </div>`,
 
     methods: {
+      gameLoop() {
+        if (Math.random() > .9) {
 
+        }
+      },  
     },
 
     computed: {
       activeEnvelopes() {
         return this.envelopes.filter(e => e.isActive)
+      },
+
+      mode() {
+        return MODES[this.debugOptions.mode]
       }
     },
 
@@ -86,8 +104,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
       }) 
 
       // Create a p5 object for whatever
-      new p5((pNew) => {
-        p = pNew
+      new p5((p) => {
+      
+        app.p = p
 
         this.mouse.addWindow({
           id:"main",
@@ -104,72 +123,22 @@ document.addEventListener("DOMContentLoaded", (event) => {
         };
 
         p.draw = () => {
-          p.background(190, 100, 90)
-
+          
           this.time.update()
-
-
-          // Try to detect faces
+          // Try to detect faces, hands, poses
           app.tracker.detect()
 
           if (app.debugOptions.showTrackerDebug)
             app.tracker.drawDebugData(p)
-          
 
-          p.fill(210, 100, 40)
-          // p.circle(0, 0, 500)
+          /**
+           * Custom mode behavior
+           **/
+          this.mode.update(app)
+          this.mode.drawBackground(app)
+          this.huxels.forEach(h => h.draw(app))
+          this.mode.draw(app)
 
-          // THIS IS ALL THE STUFF WE ARE TRACKING
-          // console.log(app.tracker)
-          // p.beginShape()
-          // app.tracker.hands.forEach(hand => {
-          //   // console.log("Ima hand", hand.isActive)
-
-          //   let pt = hand.fingers[1].tip
-
-          //   // console.log(pt)
-          //   // pt.draw(p, 40)
-          //   p.curveVertex(...pt)
-          // })
-
-          // p.endShape()
-
-          console.log(app.tracker.poses)
-
-          app.tracker.faces.forEach(face => {
-            // console.log(face)
-            
-            // // Draw nose
-            // p.fill(0, 100, 50)
-            // face.nose.draw(p, 20)
-
-            // // Draw emoji
-            // p.textSize(40)
-            // p.text("💖", ...face.nose)
-
-            // Draw glasses
-            // face.side.forEach(side => {
-            //   // do something on this side
-
-            //   // get a list of points around the eye
-            //   let ringPts = side.eyeRings[0]
-            //   let innerPts = side.eyeRings[4]
-            //   p.fill(320, 100, 0)
-            //   p.beginShape()
-            //   ringPts.forEach(pt => {
-            //     p.vertex(...pt)
-            //   })
-            //   p.endShape()
-
-            //   p.fill(320, 100, 100)
-            //   p.beginShape()
-            //   innerPts.forEach(pt => {
-            //     p.vertex(...pt)
-            //   })
-            //   p.endShape()
-            // })
-
-          })
 
         };
       }, this.$refs.p5);
