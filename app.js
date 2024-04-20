@@ -165,11 +165,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
           // clippingMask.circle(0,0, 300)
           // p.image(clippingMask, 0, 0)
 
-          this.mode.start(app)
+         
 
 
         };
       }, this.$refs.p5);
+
+       this.mode.start(app)
     },
 
     data() {
