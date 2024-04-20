@@ -39,7 +39,22 @@ class Timer {
 	}
 }
 
+const BLOCK = {
+	blueFill: [203, 49, 92],
+	blueBorder: [200, 49, 66],
+	weight: 6,
+	rounding: 5,
 
+	draw(p, x, y, w, h) {
+		p.push();
+		p.fill(...this.blueFill);
+		p.stroke(...this.blueBorder);
+		p.strokeWeight(this.weight);
+		halfWeight = this.weight / 2;
+		p.rect(x + halfWeight, y + halfWeight, w - this.weight, h - this.weight, this.rounding);
+		p.pop();
+	}
+}
 
 MODES.tetris = {
 	state: {
@@ -123,7 +138,7 @@ MODES.tetris = {
 		this.state.board = [...new Array(rows).keys()].map(() => [...new Array(cols).keys()].map(() => false))
 	},
 
-	start({}) {
+	start({p}) {
 		if (this.state.board.length === 0) {
 			this.setupBoard();
 		}
@@ -156,8 +171,8 @@ MODES.tetris = {
 		// p.fill(300, 80, 50)
 		p.circle(0, 0, 500)
 
-		tracker.drawCapture(p, 0, 0, 1.5);
-		this.drawGameArea(app, {x: 500, y: 0, w: 350, h: 700})
+		tracker.drawCapture(p, 0, 0, tracker.scale);
+		this.drawGameArea(app, {x: 700, y: 0, w: 350, h: 700})
 	},
 
 	drawGameArea({p, tracker, huxels, time, particles, debugOptions}, {x, y, w, h}) {
@@ -169,22 +184,26 @@ MODES.tetris = {
 		const rows = this.state.rows - 1;
 		//const cols = this.state.cols;
 
+		p.push();
 		this.state.board.forEach((row, i) => {
 			row.forEach((cell, j) => {
 				if (cell) {
-					p.fill(0, 0, 100)
-					p.rect(j * huxelSize[0], (rows - i) * huxelSize[1], ...huxelSize);
+					BLOCK.draw(p, j * huxelSize[0], (rows - i) * huxelSize[1], ...huxelSize);
+					// p.fill(0, 0, 100)
+					// p.rect(j * huxelSize[0], (rows - i) * huxelSize[1], ...huxelSize);
 				}
 			})
 		})
+		p.pop();
 		const active = this.state.active;
 		p.push();
 		p.translate(active.x * huxelSize[0], (rows - active.rows() - active.y) * huxelSize[1]);
 		active.shape.forEach((row, i) => {
 			row.forEach((cell, j) => {
 				if (cell && i + active.y >= 0 && j + active.x >= 0 && i + active.y < this.state.rows && j + active.x < this.state.cols) {
-					p.fill(139, 100, 100)
-					p.rect(j * huxelSize[0], (active.rows() - i) * huxelSize[1], ...huxelSize);
+					BLOCK.draw(p, j * huxelSize[0], (active.rows() - i) * huxelSize[1], ...huxelSize);
+					// p.fill(139, 100, 100)
+					// p.rect(j * huxelSize[0], (active.rows() - i) * huxelSize[1], ...huxelSize);
 				}
 			})
 		})
