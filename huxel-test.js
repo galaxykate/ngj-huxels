@@ -25,10 +25,11 @@ MODES.test = {
 	},
 
 	draw({p, tracker, huxels, time, particles, debugOptions}) {
-		// p.fill(300, 80, 50)
-		p.circle(0, 0, 500)
+		p.fill(300, 80, 50)
+		// p.circle(0, 0, 500)
+		p.text("TEST APP", 100, 100)
 
-		
+
 	},
 	
 }

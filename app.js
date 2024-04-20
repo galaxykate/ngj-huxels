@@ -34,7 +34,7 @@ let app = {
     mode: "test"
   },
   debugOptionsOptions: {
-    mode: ["test", "tetris", "fish"]
+    mode: ["ignore this"]
   }
 }
 
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         };
 
         p.draw = () => {
-
+          p.background(100, 100, 100)
           
           this.time.update()
           // Try to detect faces, hands, poses
@@ -140,10 +140,11 @@ document.addEventListener("DOMContentLoaded", (event) => {
           this.mode.update(app)
           this.mode.drawBackground(app)
 
+           if (app.debugOptions.showTrackerCamera)
+            app.tracker.drawCapture(p)
           if (app.debugOptions.showTrackerLandmarks)
             app.tracker.drawDebugData(p)
-          if (app.debugOptions.showTrackerCamera)
-            app.tracker.drawCapture(p)
+         
 
           // this.huxels.forEach(h => h.draw(app))
           this.mode.draw(app)

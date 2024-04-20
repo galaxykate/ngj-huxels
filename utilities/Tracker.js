@@ -570,9 +570,9 @@ const Tracker = (function () {
     constructor({
       maxHistory=  10,
       captureDim= [320, 240],
-      maxNumHands= 10,
-      maxNumPoses= 5,
-      maxNumFaces= 5,
+      maxNumHands= 6,
+      maxNumPoses= 3,
+      maxNumFaces= 3,
       doAcquireFaceMetrics=false,
       doAcquirePoseMetrics=false,
       doAcquireHandMetrics=false,
