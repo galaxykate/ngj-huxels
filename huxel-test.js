@@ -4,10 +4,10 @@
 
 MODES.test = {
 	start({}) {
-
+		
 	},
 
-	stop({}) {
+	stop({p, tracker, huxels, time, particles, debugOptions}) {
 
 	},
 

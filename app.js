@@ -75,25 +75,22 @@ document.addEventListener("DOMContentLoaded", (event) => {
     </div>`,
 
     methods: {
-      gameLoop() {
-        if (Math.random() > .9) {
 
-        }
-      },  
     },
 
     computed: {
-      activeEnvelopes() {
-        return this.envelopes.filter(e => e.isActive)
-      },
-
+    
       mode() {
         return MODES[this.debugOptions.mode]
       }
     },
 
     watch: {
-
+      mode() {
+        
+        console.log("MODE CHANGED")
+        this.mode.start(app)
+      }
     },
 
     mounted() {
@@ -114,6 +111,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
       new p5((p) => {
       
         app.p = p
+
+        let clippingMask = p.createGraphics(200,200)
 
         this.mouse.addWindow({
           id:"main",
@@ -157,6 +156,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
           // this.huxels.forEach(h => h.draw(app))
           this.mode.draw(app)
+
+          // clippingMask.background(0)
+          // clippingMask.circle(0,0, 300)
+          // p.image(clippingMask, 0, 0)
+
+          this.mode.start(app)
 
 
         };
