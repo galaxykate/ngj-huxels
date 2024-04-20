@@ -297,9 +297,9 @@ const Tracker = (function () {
 
 
       // Scale and mirror the positions, so they are in screen space
-        pt.x = (1 - landmarks[index].x) * imageDimensions[0]
-        pt.y = landmarks[index].y * imageDimensions[1]
-        pt.z = landmarks[index].z * imageDimensions[1]
+        pt.x = (1 - landmarks[index].x) * imageDimensions[0]*this.tracker.scale
+        pt.y = landmarks[index].y * imageDimensions[1]*this.tracker.scale
+        pt.z = landmarks[index].z * imageDimensions[1]*this.tracker.scale
 
 
       });
@@ -584,6 +584,8 @@ const Tracker = (function () {
       createLandmark
 
     } = {}) {
+
+      this.scale = 2
 
       this.mediapipePath = mediapipePath
       this.poseLandmarkerPath = poseLandmarkerPath

@@ -5,7 +5,9 @@
 /* globals Vue, p5, Tracker */
 // GLOBAL VALUES, CHANGE IF YOU WANT
 
-
+/**
+ * Make the outer window as big as possible
+ **/
 
 
 let app = {
@@ -64,6 +66,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
           {{hux}}
         </div>
       </div>
+
+
     </div>
     
     
@@ -119,14 +123,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
         this.capture;
         p.setup = () => {
-          p.createCanvas(600, 500);
+          p.createCanvas(this.$refs.p5.offsetWidth, this.$refs.p5.offsetHeight);
           p.colorMode(p.HSL);
           this.tracker.createCaptureAndInitTracking(p)
 
         };
 
         p.draw = () => {
-          p.background(100, 100, 100)
+          p.background(190, 100, 90)
           
           this.time.update()
           // Try to detect faces, hands, poses
@@ -140,8 +144,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
           this.mode.update(app)
           this.mode.drawBackground(app)
 
-           if (app.debugOptions.showTrackerCamera)
-            app.tracker.drawCapture(p)
+           if (app.debugOptions.showTrackerCamera) {
+            p.push()
+            p.scale(app.tracker.scale,app.tracker.scale)
+             app.tracker.drawCapture(p)
+             p.pop()
+           }
+           
           if (app.debugOptions.showTrackerLandmarks)
             app.tracker.drawDebugData(p)
          
