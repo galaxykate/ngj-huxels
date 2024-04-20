@@ -4,11 +4,11 @@
 
 MODES.test = {
 	start({}) {
-		
+		console.log("START TEST")
 	},
 
 	stop({p, tracker, huxels, time, particles, debugOptions}) {
-
+		console.log("STOP TEST")
 	},
 
 	update({p, tracker, huxels, time, particles, debugOptions}) {

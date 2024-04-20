@@ -1,10 +1,10 @@
 MODES.fish = {
 	start({}) {
-
+		console.log("START FISH")
 	},
 
 	stop({}) {
-
+		console.log("STOP FISH")
 	},
 
 	update({p, tracker, huxels, time, particles, debugOptions}) {
