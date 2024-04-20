@@ -48,7 +48,7 @@ MODES.tetris = {
 		board: [],
 		updateTimer: new Timer(500, (timer) => {
 			this.updateActive()
-		}, true)
+		}, true),
 		active: {
 			x: 0,
 			y: 0,
@@ -56,7 +56,10 @@ MODES.tetris = {
 			translate(x, y) {
 				this.x += x;
 				this.y += y;
-			}
+			},
+			isDown: () => this.shape.some((row, i) => {
+				row.some((cell, j) => cell && MODES.tetris.state.board[this.y + i - 1][this.x + j])
+			})
 		}
 	},
 
@@ -76,8 +79,6 @@ MODES.tetris = {
 	},
 
 	update({p, tracker, huxels, time, particles, debugOptions}) {
-		this.timers.forEach(timer => timer.update(time.dt))
-
 		if (Math.random() > .9) {
 			let x = randInt(0, this.state.cols - 1)
 			let y = randInt(0, this.state.rows - 1)
