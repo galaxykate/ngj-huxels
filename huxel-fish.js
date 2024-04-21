@@ -27,7 +27,7 @@ MODES.fish = {
 	draw({p, tracker, huxels, time, particles, debugOptions}) {
 		// SOUND.tetris1.rate()
 
-		p.circle(0, 0, 100)
+		
 		p.image(IMAGE.deer, 30, 30)
           // tracker.faces.forEach((f,index) => {
           //   p.image(f.thumbnail, 100*index, 0)
