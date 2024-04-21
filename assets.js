@@ -5,7 +5,7 @@
 
 let COLOR = {
 
-	monsterCyan: [200, 100, 60]
+	monsterCyan: [190, 100, 60]
 }
 
 let IMAGE_ASSET_FILES = {
