@@ -120,8 +120,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
         app.p = p
 
-        let clippingMask = p.createGraphics(app.faceThumbnailSize,app.faceThumbnailSize)
-       
 
         // Make graphics for each face
         this.tracker.faces.forEach(f => {
@@ -135,9 +133,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
           id:"main",
           p})
 
-        // We have a new "p" object representing the sketch
+        p.preload = () => {
+          // Load all images
+          loadImageAssets(p)
+          loadSoundAssets(p)
+        }
 
-        this.capture;
+
+        // We have a new "p" object representing the sketch
         p.setup = () => {
           p.createCanvas(this.$refs.p5.offsetWidth, this.$refs.p5.offsetHeight);
           p.colorMode(p.HSL);
