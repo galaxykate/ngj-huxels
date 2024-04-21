@@ -115,7 +115,7 @@ MODES.tetris = {
 						})
 					});
 					const rowsToDelete = that.state.board.map((row, i) => row.every((cell) => cell) ? i : false).filter((i) => i !== false);
-					that.state.score += rowsToDelete.length;
+					app.score.value += rowsToDelete.length;
 					rowsToDelete.forEach((i) => {
 						that.state.board.splice(i, 1);
 						that.state.board.push(Array(that.options.cols).fill(false));

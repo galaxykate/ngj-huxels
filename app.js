@@ -39,7 +39,9 @@ let app = {
   debugOptionsOptions: {
     mode: ["ignore this"]
   },
-  score: 0
+  score: {
+    value: 0
+  }
 }
 
 
@@ -55,7 +57,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     template: `<div id="app">
 
     <div id="main-drawing" ref="p5"></div>
-    <div id="score">Score: {{score}}</div>
+    <div id="score">Score: {{score.value}}</div>
 
     <div class="controls">
       <curve-editor :points="points"  v-if="false" />
@@ -90,7 +92,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
     },
 
     watch: {
-
       mode() {
         this.lastMode?.stop(app)
         this.lastMode = this.mode
@@ -101,7 +102,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
     },
 
     mounted() {
-
       initMidi({
         onKeyUp: (note,velocity) => {
         console.log("UP", note, velocity)
