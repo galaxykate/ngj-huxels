@@ -186,8 +186,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
           // Update all the thumbnails
           this.tracker.faces.forEach((f,index) => {
             if (f.isActive) {
-              p.rect(f.x, f.y, f.w, f.h)
-
+              
               // Bit of a border
               let x = f.x - 40
               let y = f.y - 20
@@ -213,24 +212,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
               makePixelsOutsideCircleTransparent(img, thumbH/2, thumbH/2, thumbH/2)
             }
           })
-
-
-
-          // clippingMask.loadPixels()
-
-
-          // clippingMask.updatePixels()
-
-
-
-          // The clipping mask is W,H
-          // We want to get an image of x
-
-          p.image(clippingMask, 0, 0)
-
-
-         
-
 
         };
       }, this.$refs.p5);
