@@ -86,6 +86,7 @@ MODES.tetris = {
 		textRotation: [-15, 15],
 		textPosX: [700, 740],
 		textPosY: [200, 300],
+		validModes: ["tentacles", "stickfigure", "bee", "clean"]
 	},
 	state: {
 		board: [],
@@ -223,7 +224,8 @@ MODES.tetris = {
 		this.updatePlayerInput({p, tracker, huxels, time, particles, debugOptions});
 		const sound = this.options.levels[this.state.level].sound;
 		if (SOUND[sound] && !SOUND[sound].isPlaying()) {
-			const modeKeys = Object.keys(MODES);
+			//const modeKeys = Object.keys(this.options.validModes);
+			const modeKeys = this.options.validModes;
 			debugOptions.mode = modeKeys[Math.floor(Math.random() * modeKeys.length)];
 		}
 	},
@@ -264,7 +266,7 @@ MODES.tetris = {
 	draw(app) {
 		let {p, tracker, huxels, time, particles, debugOptions} = app;
 		// p.fill(300, 80, 50)
-		p.circle(0, 0, 500)
+		//p.circle(0, 0, 500)
 
 		this.drawControlGrid(app, {x: 230, y: 175, w: 700, h: 700})
 		this.drawGameArea(app, {x: 1260, y: 110, w: this.options.cols * this.options.huxelSize[0], h: this.options.rows * this.options.huxelSize[1]})
