@@ -7,6 +7,7 @@ let previousKeypoints = [];
 let isLooking = false;
 let isMoving = false;
 let danceMusicPlaying = false;
+let laserPlaying = false;
 
 let timer;
 
@@ -20,7 +21,7 @@ let scaleFactor = 0;
 MODES.stickfigure = {
 	start({ p, tracker }) {
 		tracker.scale = 4;
-		timer = new Timer(10000, () => {app.debugOptions.mode = "tetris"})
+		timer = new Timer(30000, () => {app.debugOptions.mode = "tetris"})
 	},
 
 	stop({ }) {
@@ -56,12 +57,17 @@ MODES.stickfigure = {
 				// Player loses or gets penalized
 
 				p.image(IMAGE.laser, p.width*.15, p.height*.15, p.width*.7, p.height*.7);
+				if (!laserPlaying){
+					SOUND.birdLaser0.play()
+				}
+			} else {
+				SOUND.birdLaser0.stop()
 			}
+			laserPlaying = !laserPlaying
 		} else {
 			if (isMoving) {
 				// Player gains points
 				drawMusicalNotes(p, tracker, 10);
-
 			}
 		}
 	},

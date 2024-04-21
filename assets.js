@@ -11,6 +11,7 @@ let COLOR = {
 let IMAGE_ASSET_FILES = {
 	"deer": "clipart2598461.png",
 	"tetrisBackground": "BG_tetris.png",
+	"amazingText": "amazing.png",
     //
     "bird_head": "bird_head.png",
     "bird_body": "bird_body.png",
