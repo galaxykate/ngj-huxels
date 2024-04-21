@@ -12,11 +12,6 @@ MODES.start = {
 	},
 
 	update({p, tracker, huxels, time, particles, debugOptions}) {
-		if (Math.random() > .9) {
-			let x = randInt(0, 10)
-			let y = randInt(0, 10)
-			huxels.push(new Huxel(x, y))
-		}
 
 	},
 
