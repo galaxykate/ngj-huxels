@@ -44,13 +44,20 @@ const BLUE = 2;
 const BLOCK = {
 	blueFill: [203, 49, 92],
 	blueBorder: [200, 49, 66],
+	redFill: [17, 46, 85],
+	redBorder: [5, 47, 73],
 	weight: 6,
 	rounding: 5,
 
-	draw(p, x, y, w, h) {
+	draw(p, x, y, w, h, color) {
 		p.push();
-		p.fill(...this.blueFill);
-		p.stroke(...this.blueBorder);
+		if (color === RED) {
+			p.fill(...this.redFill);
+			p.stroke(...this.redBorder);
+		} else {
+			p.fill(...this.blueFill);
+			p.stroke(...this.blueBorder);
+		}
 		p.strokeWeight(this.weight);
 		halfWeight = this.weight / 2;
 		p.rect(x + halfWeight, y + halfWeight, w - this.weight, h - this.weight, this.rounding);
@@ -71,7 +78,8 @@ MODES.tetris = {
 			MODES.tetris.state.active.update();
 		}, true),
 		active: null,
-		playerInput: null
+		playerInput: null,
+		score: 0
 	},
 
 	newActive() {
@@ -101,9 +109,15 @@ MODES.tetris = {
 						row.forEach((cell, j) => {
 							if (cell) {
 								// This is where it crashes on loss.. So fix this later
-								that.state.board[this.y + i][this.x + j] = true;
+								that.state.board[this.y + i][this.x + j] = cell;
 							}
 						})
+					});
+					const rowsToDelete = that.state.board.map((row, i) => row.every((cell) => cell) ? i : false).filter((i) => i !== false);
+					that.state.score += rowsToDelete.length;
+					rowsToDelete.forEach((i) => {
+						that.state.board.splice(i, 1);
+						that.state.board.push(Array(that.options.cols).fill(false));
 					});
 					that.newActive();
 				}
@@ -196,8 +210,8 @@ MODES.tetris = {
 			// console.log(x, y);
 
 			if (x >= 0 && x < cols && y >= 0 && y < rows) {
-				console.log("Matched:", x, y);
-				this.state.playerInput[y][x] = true;
+				//console.log("Matched:", x, y);
+				this.state.playerInput[y][x] = hand.tetrisColor;
 			}
 		})
 
@@ -224,6 +238,9 @@ MODES.tetris = {
 		// p.scale(tracker.scale, tracker.scale);
 		tracker.hands.forEach((hand) => {
 			if (!hand.isActive) return;
+			if (!hand.tetrisColor) {
+				hand.tetrisColor = Math.random() > 0.5 ? RED : BLUE;
+			}
 			p.push();
 			p.fill(139, 100, 100);
 			p.circle(hand.center.x, hand.center.y, 10);
@@ -241,10 +258,13 @@ MODES.tetris = {
 
 		const rows = this.options.inputRows - 1;
 		p.push();
+		p.stroke(0, 0, 0);
 		this.state.playerInput.forEach((row, i) => {
 			row.forEach((cell, j) => {
-				if (cell) {
-					p.fill(139, 100, 100, 0.8);
+				if (cell === RED) {
+					p.fill(...BLOCK.redBorder, 0.8);
+				} else if (cell === BLUE) {
+					p.fill(...BLOCK.blueBorder, 0.8);
 				} else {
 					p.fill(0, 0, 100, 0.1);
 				}
@@ -269,7 +289,7 @@ MODES.tetris = {
 		this.state.board.forEach((row, i) => {
 			row.forEach((cell, j) => {
 				if (cell) {
-					BLOCK.draw(p, j * huxelSize[0], (rows - i) * huxelSize[1], ...huxelSize);
+					BLOCK.draw(p, j * huxelSize[0], (rows - i) * huxelSize[1], ...huxelSize, cell);
 					// p.fill(0, 0, 100)
 					// p.rect(j * huxelSize[0], (rows - i) * huxelSize[1], ...huxelSize);
 				}
@@ -282,7 +302,7 @@ MODES.tetris = {
 		active.shape.forEach((row, i) => {
 			row.forEach((cell, j) => {
 				if (cell && i + active.y >= 0 && j + active.x >= 0 && i + active.y < this.options.rows && j + active.x < this.options.cols) {
-					BLOCK.draw(p, j * huxelSize[0], (active.rows() - i) * huxelSize[1], ...huxelSize);
+					BLOCK.draw(p, j * huxelSize[0], (active.rows() - i) * huxelSize[1], ...huxelSize, cell);
 					// p.fill(139, 100, 100)
 					// p.rect(j * huxelSize[0], (active.rows() - i) * huxelSize[1], ...huxelSize);
 				}
