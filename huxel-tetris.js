@@ -71,7 +71,7 @@ MODES.tetris = {
 		cols: 5,
 		inputRows: 4,
 		inputCols: 5,
-		huxelSize: [45, 45],
+		huxelSize: [55, 55],
 		levels: [
 			{sound: "tetris1", speed: 150},
 			{sound: "tetris2", speed: 125},
@@ -82,7 +82,10 @@ MODES.tetris = {
 			{sound: "tetris7", speed: 30},
 			{sound: "tetris8", speed: 20},
 			{sound: "tetris9", speed: 10},
-		]
+		],
+		textRotation: [-15, 15],
+		textPosX: [700, 740],
+		textPosY: [200, 300],
 	},
 	state: {
 		board: [],
@@ -127,7 +130,7 @@ MODES.tetris = {
 						})
 					});
 					const rowsToDelete = that.state.board.map((row, i) => row.every((cell) => cell) ? i : false).filter((i) => i !== false);
-					app.score.value += rowsToDelete.length * that.state.level + 1;
+					app.score.value += rowsToDelete.length * (that.state.level + 1);
 					rowsToDelete.forEach((i) => {
 						that.state.board.splice(i, 1);
 						that.state.board.push(Array(that.options.cols).fill(false));
@@ -188,7 +191,7 @@ MODES.tetris = {
 		this.state.playerInput = this.generatePlayerShape();
 	},
 
-	start({p}) {
+	start({p, tracker}) {
 		if (this.state.board.length === 0) {
 			this.setupBoard();
 		}
@@ -199,18 +202,20 @@ MODES.tetris = {
 			this.newActive();
 		}
 		this.state.level = Math.min(this.state.level + 1, this.options.levels.length - 1);
-		console.log(this.options.levels)
 		const sound = this.options.levels[this.state.level].sound;
 		console.log(sound)
 		if (SOUND[sound]) {
 			SOUND[sound].play();
 		}
 		this.state.updateTimer.endTime = this.options.levels[this.state.level].speed;
-		console.log(this.state.updateTimer.endTime)
+		tracker.scale = 2.8;
 	},
 
 	stop({}) {
-		SOUND.tetris1.stop();
+		const sound = this.options.levels[this.state.level].sound;
+		if (SOUND[sound]) {
+			SOUND[sound].stop();
+		}
 	},
 
 	update({p, tracker, huxels, time, particles, debugOptions}) {
@@ -261,8 +266,8 @@ MODES.tetris = {
 		// p.fill(300, 80, 50)
 		p.circle(0, 0, 500)
 
-		this.drawControlGrid(app, {x: 700, y: 200, w: 700, h: 700})
-		this.drawGameArea(app, {x: 210, y: 180, w: this.options.cols * this.options.huxelSize[0], h: this.options.rows * this.options.huxelSize[1]})
+		this.drawControlGrid(app, {x: 230, y: 175, w: 700, h: 700})
+		this.drawGameArea(app, {x: 1260, y: 110, w: this.options.cols * this.options.huxelSize[0], h: this.options.rows * this.options.huxelSize[1]})
 		//this.drawDebug(app);
 	},
 

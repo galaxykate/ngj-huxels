@@ -54,6 +54,15 @@ class Vector2D {
 		return new Vector2D().addMultiple(...args)
 	}
   
+  static polarOffsetBezierVertex(p, p0, r0, theta0,p1, r1, theta1) {
+		// console.log(this.x + r*Math.cos(theta), this.y + r*Math.sin(theta))
+		p.bezierVertex(
+			p0.x + r0*Math.cos(theta0), p0.y + r0*Math.sin(theta0), 
+			p1.x + r1*Math.cos(theta1), p1.y + r1*Math.sin(theta1), 
+			p1.x, p1.y)
+	}
+
+
    
   static lerpVertex({p, v0, v1, pct=.5, n=0}) {
     if (Array.isArray(v0))
@@ -78,6 +87,10 @@ class Vector2D {
 		return new Vector2D(this.x, this.y);
 	}
 
+	createPolarOffset(r, theta) {
+		return new Vector2D(this.x + r*Math.cos(theta), this.y+ r*Math.sin(theta));
+	}
+
 
   // =========
 	// Getters
@@ -96,7 +109,7 @@ class Vector2D {
 	}
 
 	getAngleTo(v) {
-		return atan2(v.y- this.y, v.x - this.x)
+		return Math.atan2(v.y- this.y, v.x - this.x)
 	}
 
 	getNormal() {
@@ -361,6 +374,12 @@ lerpTo(pt, pct) {
 
 	// =========
 	// Draw
+
+	polarOffsetVertex(p, r, theta) {
+		// console.log(this.x + r*Math.cos(theta), this.y + r*Math.sin(theta))
+		p.vertex(this.x + r*Math.cos(theta), this.y + r*Math.sin(theta))
+	}
+
 
 	draw(p, radius=10) {
 		p.circle(...this, radius)

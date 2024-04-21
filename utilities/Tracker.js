@@ -217,6 +217,7 @@ const Tracker = (function () {
       this.isActive = false;
 
       this.boundingBox = [new Vector2D(0,0),new Vector2D(0,0)]
+      this.center = new Vector2D()
 
     // Create the landmarks
       this.landmarks = Array.from(
@@ -357,6 +358,7 @@ const Tracker = (function () {
           this.boundingBox[1].x = Math.max(this.boundingBox[1].x, lmk.x)
           this.boundingBox[1].y = Math.max(this.boundingBox[1].y, lmk.y)
         })
+
         // console.log(this.boundingBox[0].toFixed(2), this.boundingBox[1].toFixed(2))
 
       }
@@ -432,6 +434,7 @@ const Tracker = (function () {
     constructor(tracker, createLandmark) {
       super(tracker, FACE_LANDMARK_COUNT, createLandmark);
       this.name = "Face" + this.idNumber
+      this.type = "face"
 
       this.blendShapes = {};
       CATEGORIES.forEach((c) => (this.blendShapes[c] = 0));
@@ -508,8 +511,6 @@ const Tracker = (function () {
         setToAverage(v, indices.map(index => this.landmarks[index]))
       }
 
-      setToAverage(this.center, [this.side[0].ear,this.side[1].ear])
-
 
       this.side.forEach((side,i) => {
         setToDifference(side.earDirOut, side.ear, this.nose)
@@ -532,7 +533,9 @@ const Tracker = (function () {
       setToDifference(this.dirWidth, this.side[1].ear, this.side[0].ear)
       setToDifference(this.dirLength, this.chin, this.forehead)
 
-
+      
+      this.center.x = this.x + this.w/2
+      this.center.y = this.y + this.h/2
     }
   }
   /*
@@ -570,8 +573,6 @@ const Tracker = (function () {
       this.type = "hand"
       this.handedness = undefined;
       this.tracker = tracker
-
-      this.center = new Vector2D()
 
       this.fingers = Array.from({length:5}, (x, i)=> {
         let joints = CONTOURS.fingers[i].map(index => this.landmarks[index])

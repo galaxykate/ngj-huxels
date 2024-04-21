@@ -5,12 +5,13 @@
 
 let COLOR = {
 
-	monsterCyan: [200, 100, 60]
+	monsterCyan: [190, 100, 60]
 }
 
 let IMAGE_ASSET_FILES = {
 	"deer": "clipart2598461.png",
 	"tetrisBackground": "BG_tetris.png",
+	"amazingText": "amazing.png",
     //
     "bird_head": "bird_head.png",
     "bird_body": "bird_body.png",
