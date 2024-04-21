@@ -4,21 +4,23 @@
 
 let previousKeypoints = [];
 
-let img;
-
 let isLooking = false;
 let isMoving = false;
+let danceMusicPlaying = false;
+
 let lookTimer = 0;
-let lookDuration = 3000;
+const lookDuration = 3000;
+let lastDanceTime = 0; // Timestamp of when the last dance happened
+const danceCooldown = 1000; // Cooldown period in milliseconds
 let score = 0;
 
 MODES.stickfigure = {
 	start({ p }) {
-		this.img = p.loadImage('../assets/leaf.png');
+		
 	},
 
 	stop({ }) {
-
+		SOUND.stick_dance.stop();
 	},
 
 	update({ p, tracker, huxels, time, particles, debugOptions }) {
@@ -31,7 +33,7 @@ MODES.stickfigure = {
 	},
 
 	drawBackground({ p, tracker, huxels, time, particles, debugOptions }) {
-		//p.background(50, 100, 90)
+		p.image(IMAGE.jungle_bg, 0, 0, p.width, p.height);
 	},
 
 	draw({ p, tracker, huxels, time, particles, debugOptions }) {
@@ -70,19 +72,22 @@ function checkGameMasterState(time) {
   }
 
   function drawGameMaster(p) {
+	let bird_loc_x = 80
+	let bird_loc_y = 20
+
 	// Draw the game master on the canvas
-	if (isLooking){
-		p.fill(0, 100, 100);
+	// TODO: SCALE the head!!
+	if (isLooking){	
+		p.image(IMAGE.bird_head, p.width - 2 * bird_loc_x - IMAGE.bird_head.width, bird_loc_y);
 	} else {
-		p.fill(0, 0, 0);
+		p.push();
+		p.scale(-1, 1);
+		p.image(IMAGE.bird_head, -p.width + bird_loc_x, bird_loc_y);
+		p.pop();
 	}
-	
-	p.ellipse(1000, 100, 300, 300)
   }
   
   function drawPlayer(p, tracker) {
-	this.img = p.loadImage('../assets/leaf.png');
-
 	// Use pose data to draw the player on the canvas
 	tracker.poses.forEach((pose) => {
 		if (pose.isActive) {
@@ -141,7 +146,7 @@ function checkGameMasterState(time) {
 				p.push(); // Save the current drawing state
 				p.translate(head_top.x, head_top.y); // Move the origin to head_top
 				p.rotate(PI + angleBetweenLeaves * i); // Rotate by the angle between leaves times the iterator
-				p.image(this.img, 10.5, -10.5, 100, 42); // Draw the leaf image offset from the head_top
+				p.image(IMAGE.leaf, 10.5, -10.5, 100, 42); // Draw the leaf image offset from the head_top
 				p.pop(); // Restore the original drawing state
 			}
 
@@ -155,7 +160,7 @@ function checkGameMasterState(time) {
 				p.push(); // Save the current drawing state
 				p.translate(hand_left.x, hand_left.y); // Move the origin to head_top
 				p.rotate(PI + angleBetweenLeaves * i); // Rotate by the angle between leaves times the iterator
-				p.image(this.img, 10.5, -10.5, 100, 42); // Draw the leaf image offset from the head_top
+				p.image(IMAGE.leaf, 10.5, -10.5, 100, 42); // Draw the leaf image offset from the head_top
 				p.pop(); // Restore the original drawing state
 			}
 
@@ -163,7 +168,7 @@ function checkGameMasterState(time) {
 				p.push(); // Save the current drawing state
 				p.translate(hand_right.x, hand_right.y); // Move the origin to head_top
 				p.rotate(PI * 1.5 + angleBetweenLeaves * i); // Rotate by the angle between leaves times the iterator
-				p.image(this.img, 10.5, -10.5, 100, 42); // Draw the leaf image offset from the head_top
+				p.image(IMAGE.leaf, 10.5, -10.5, 100, 42); // Draw the leaf image offset from the head_top
 				p.pop(); // Restore the original drawing state
 			}
 
@@ -179,14 +184,27 @@ function checkGameMasterState(time) {
 
 			if (previousKeypoints.length > 0) {
 				let movementLevel = calculateMovement(p, previousKeypoints, currentKeypoints);
-				// console.log(movementLevel)
+				console.log(movementLevel)
+
+				// Check the cooldown before playing the music
+				let timeNow = p.millis();
+				if (movementLevel > 200 && !danceMusicPlaying && timeNow - lastDanceTime > danceCooldown) {
+				  SOUND.stick_dance.play();
+				  danceMusicPlaying = true;
+				} else if (movementLevel <= 200 && danceMusicPlaying) {
+				  SOUND.stick_dance.pause();
+				  danceMusicPlaying = false;
+				  lastDanceTime = timeNow; // Update the timestamp of the last dance
+				}
 
 				if (movementLevel > 200 && movementLevel < 600 && !isLooking) {
 					// REWARD!!
 					isMoving = true;
+					drawMusicalNotes(p, 3);
 				} else if (movementLevel > 600 && isLooking) {
 					// PUNISHMENT!!
 					isMoving = true;
+					drawMusicalNotes(p, 9);
 				} else {
 					isMoving = false;
 				}
@@ -197,6 +215,35 @@ function checkGameMasterState(time) {
 			});
 		}
 	});
+  }
+
+  function drawMusicalNotes(p, num) {
+	// Decide how many notes to draw
+	let numberOfNotes = num; // For example, draw 10 notes
+
+	for (let i = 0; i < numberOfNotes; i++) {
+	  // Randomly select one of the two images
+	  let noteImage = [IMAGE.musical_note1, IMAGE.musical_note2];
+
+	  // Define a "center zone" range around the middle of the canvas
+	  let centerX = p.width / 2;
+	  let centerY = p.height / 2;
+	  let rangeX = p.width * 0.3; // 20% of the canvas width
+	  let rangeY = p.height * 0.3; // 20% of the canvas height
+  
+	  // Random x and y positions within the "center zone"
+	  let x = centerX + p.random(-rangeX, rangeX);
+	  let y = centerY + p.random(-rangeY, rangeY);
+
+	  let randomNum = getRandomInt(2);
+	  
+	  // Draw the note image at the calculated position
+	  p.image(noteImage[randomNum], x, y, 24, 36);
+	}
+  }
+
+  function getRandomInt(max) {
+	return Math.floor(Math.random() * max);
   }
 
 function drawTrapezoid(p, topCenter, bottomCenter, topWidth, bottomWidth) {
