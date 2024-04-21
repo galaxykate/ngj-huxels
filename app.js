@@ -29,7 +29,7 @@ let app = {
   }),
   mouse: new DraggableMouse(),
   huxels: [],
-  time:new HeartBeatTime({loopOver: 3}),
+  time:new HeartBeatTime({}),
   debugOptions: {
     speed: 1,
     showTrackerLandmarks: false,

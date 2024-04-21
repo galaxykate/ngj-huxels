@@ -3,6 +3,11 @@
  * 
  **/
 
+let COLOR = {
+
+	monsterCyan: [200, 100, 60]
+}
+
 let IMAGE_ASSET_FILES = {
 	"deer": "clipart2598461.png",
 }
