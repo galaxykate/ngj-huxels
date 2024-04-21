@@ -9,6 +9,8 @@ let COLOR = {
 }
 
 let IMAGE_ASSET_FILES = {
+	"loading": "loading_.png",
+
 	"deer": "clipart2598461.png",
 	"tetrisBackground": "BG_tetris.png",
 	"amazingText": "amazing.png",
