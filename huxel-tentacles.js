@@ -2,6 +2,7 @@
 
 MODES.tentacles = {
 	start({p, tracker}) {
+		SOUND.monsterAmbience.play()
 
 		tracker.scale = 4
 		this.monsterWidth = p.width*.3
@@ -42,10 +43,12 @@ MODES.tentacles = {
 		setTimeout(() => {
 			tracker.scale = 2
 			app.debugOptions.mode = "tetris"
-		}, 3000)
+		}, 30000)
 	},
 
 	stop({}) {
+		SOUND.monsterAmbience.stop()
+
 		console.log("STOP TENTACLES")
 		// SOUND.tetris1.stop()
 
