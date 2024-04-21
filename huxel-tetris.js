@@ -71,7 +71,18 @@ MODES.tetris = {
 		cols: 5,
 		inputRows: 4,
 		inputCols: 5,
-		huxelSize: [45, 45]
+		huxelSize: [45, 45],
+		levels: [
+			{sound: "tetris1", speed: 150},
+			{sound: "tetris2", speed: 125},
+			{sound: "tetris3", speed: 100},
+			{sound: "tetris4", speed: 85},
+			{sound: "tetris5", speed: 70},
+			{sound: "tetris6", speed: 50},
+			{sound: "tetris7", speed: 30},
+			{sound: "tetris8", speed: 20},
+			{sound: "tetris9", speed: 10},
+		]
 	},
 	state: {
 		board: [],
@@ -80,7 +91,8 @@ MODES.tetris = {
 		}, true),
 		active: null,
 		playerInput: null,
-		score: 0
+		score: 0,
+		level: -1
 	},
 
 	newActive() {
@@ -115,7 +127,7 @@ MODES.tetris = {
 						})
 					});
 					const rowsToDelete = that.state.board.map((row, i) => row.every((cell) => cell) ? i : false).filter((i) => i !== false);
-					that.state.score += rowsToDelete.length;
+					app.score.value += rowsToDelete.length * that.state.level + 1;
 					rowsToDelete.forEach((i) => {
 						that.state.board.splice(i, 1);
 						that.state.board.push(Array(that.options.cols).fill(false));
@@ -186,7 +198,15 @@ MODES.tetris = {
 		if (!this.state.active) {
 			this.newActive();
 		}
-		SOUND.tetris1.play();
+		this.state.level = Math.min(this.state.level + 1, this.options.levels.length - 1);
+		console.log(this.options.levels)
+		const sound = this.options.levels[this.state.level].sound;
+		console.log(sound)
+		if (SOUND[sound]) {
+			SOUND[sound].play();
+		}
+		this.state.updateTimer.endTime = this.options.levels[this.state.level].speed;
+		console.log(this.state.updateTimer.endTime)
 	},
 
 	stop({}) {
@@ -196,6 +216,11 @@ MODES.tetris = {
 	update({p, tracker, huxels, time, particles, debugOptions}) {
 		this.state.updateTimer.update(time.dt);
 		this.updatePlayerInput({p, tracker, huxels, time, particles, debugOptions});
+		const sound = this.options.levels[this.state.level].sound;
+		if (SOUND[sound] && !SOUND[sound].isPlaying()) {
+			const modeKeys = Object.keys(MODES);
+			debugOptions.mode = modeKeys[Math.floor(Math.random() * modeKeys.length)];
+		}
 	},
 
 	updatePlayerInput({p, tracker, huxels, time, particles, debugOptions}) {
@@ -237,7 +262,7 @@ MODES.tetris = {
 		p.circle(0, 0, 500)
 
 		this.drawControlGrid(app, {x: 700, y: 200, w: 700, h: 700})
-		this.drawGameArea(app, {x: 300, y: 100, w: this.options.cols * this.options.huxelSize[0], h: this.options.rows * this.options.huxelSize[1]})
+		this.drawGameArea(app, {x: 210, y: 180, w: this.options.cols * this.options.huxelSize[0], h: this.options.rows * this.options.huxelSize[1]})
 		//this.drawDebug(app);
 	},
 
@@ -289,7 +314,8 @@ MODES.tetris = {
 	drawGameArea({p, tracker, huxels, time, particles, debugOptions}, {x, y, w, h}) {
 		p.push();
 		p.translate(x, y);
-		p.fill(0, 0, 0);
+		p.stroke(0, 0, 0);
+		p.fill(0, 0, 100, 0.3);
 		p.rect(0, 0, w, h);
 		const huxelSize = [w / this.options.cols, h / this.options.rows];
 		const rows = this.options.rows - 1;

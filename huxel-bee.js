@@ -1,90 +1,156 @@
 MODES.bee = {
 	bees: [],
 	flowers: [],
-	hives: [
-		{
-			x: 0,
-			color: [0, 100, 50],
-			pollen: 0
-		},
-		{
-			x: 512,
-			color: [180, 100, 50],
-			pollen: 0
-		}
-	],
-	hiveRect: {y: 0, width: 128, height: 256},
+	hives: [110, 1550],
+	hiveRect: {y: 400, width: 270, height: 320},
 
 	start({p, tracker, huxels, time, particles, debugOptions}) {
+		tracker.scale = 2
 		let beeMax = []
+		this.bees = []
 		tracker.hands.forEach(hand => {
 			this.bees.push(0)
 			beeMax.push(500)
 		})
+		this.flowers = []
 		tracker.faces.forEach(face => {
 			this.flowers.push(Array.from(beeMax))
 		})
+		SOUND.beeAmbience.play()
+		SOUND.beeAmbience.setVolume(0.1)
 	},
 
 	stop({p, tracker, huxels, time, particles, debugOptions}) {
+		SOUND.beeAmbience.stop()
+		SOUND.beeLoop.stop()
+		SOUND.beePollinateLoop.stop()
+		SOUND.beePollinateEnd.stop()
+		SOUND.beeDropOff0.stop()
+		SOUND.beeDropOff1.stop()
+		SOUND.beeDropOff2.stop()
 	},
 
 	update({p, tracker, huxels, time, particles, debugOptions}) {
+		if (!SOUND.beeAmbience.isPlaying()) {
+			debugOptions.mode = "tetris"
+		}
+		let beeActive = false
+		let isPollinating = false
 		tracker.hands.forEach((hand, index) => {
 			if (hand.isActive) {
-				let position = hand.center
+				beeActive = true
+				let position = this.getScreenPosition(hand.center)
 				let foundFlower = false
 				for (let index2 = 0; index2 < tracker.faces.length; index2++) {
 					let face = tracker.faces[index2]
-					if (face.isActive && Vector2D.distance(position, face.nose) < 64) {
+					if (face.isActive && Vector2D.distance(position, this.getScreenPosition(face.nose)) < 160) {
 						let pollen = Math.min(time.dt, 500 - this.bees[index], this.flowers[index2][index])
 						this.bees[index] += pollen
 						this.flowers[index2][index] -= pollen
 						foundFlower = true
+						if (pollen > 0) {
+							isPollinating = true
+							if (Math.min(500 - this.bees[index], this.flowers[index2][index]) <= 0) {
+								SOUND.beePollinateEnd.play()
+								SOUND.beePollinateEnd.setVolume(0.5)
+							}
+						}
 						break
 					}
 				}
-				if (!foundFlower) {
+				if (!foundFlower && this.bees[index] > 0) {
 					this.hives.forEach(hive => {
-						if (position.x >= hive.x && position.x <= hive.x + this.hiveRect.width && position.y >= this.hiveRect.y && position.y <= this.hiveRect.y + this.hiveRect.height) {
+						if (position.x >= hive && position.x <= hive + this.hiveRect.width && position.y >= this.hiveRect.y && position.y <= this.hiveRect.y + this.hiveRect.height) {
 							if (this.bees[index] >= time.dt) {
-								hive.pollen += time.dt
+								app.score.value += time.dt
 								this.bees[index] -= time.dt
 							} else {
-								hive.pollen += this.bees[index]
+								app.score.value += this.bees[index]
 								this.bees[index] = 0
+							}
+							if (this.bees[index] <= 0) {
+								switch (Math.floor(Math.random() * 3)) {
+									case 0:
+										SOUND.beeDropOff0.play()
+										SOUND.beeDropOff0.setVolume(0.5)
+										break
+									case 1:
+										SOUND.beeDropOff1.play()
+										SOUND.beeDropOff1.setVolume(0.5)
+										break
+									case 2:
+										SOUND.beeDropOff2.play()
+										SOUND.beeDropOff2.setVolume(0.5)
+										break
+									default:
+										break
+								}
 							}
 						}
 					})
 				}
 			}
 		})
+		if (beeActive && !SOUND.beeLoop.isLooping()) {
+			SOUND.beeLoop.loop()
+		} else if (!beeActive) {
+			SOUND.beeLoop.stop()
+		}
+		if (isPollinating && !SOUND.beePollinateLoop.isLooping()) {
+			SOUND.beePollinateLoop.loop()
+			SOUND.beePollinateLoop.setVolume(0.5)
+		} else if (!isPollinating) {
+			SOUND.beePollinateLoop.stop()
+		}
 	},
 
 	drawBackground({p, tracker, huxels, time, particles, debugOptions}) {
-		// p.background(50, 100, 90)
+		p.image(IMAGE.beeClouds, 0, 0, 1920, 1080)
 	},
 
 	draw({p, tracker, huxels, time, particles, debugOptions}) {
-		p.textSize(64)
-		this.hives.forEach(hive => {
-			p.fill(...hive.color)
-			p.rect(hive.x, this.hiveRect.y, this.hiveRect.width, this.hiveRect.height)
-		})
-		p.fill(0, 0, 0)
-		tracker.faces.forEach(face => {
+		p.imageMode(p.CENTER)
+		p.image(IMAGE.beeSun, 480, 240)
+		if (tracker.faces[0].isActive) {
+			p.tint(48, 100, 50)
+			p.image(tracker.faces[0].thumbnail, 480, 230, 240, 240)
+			p.noTint()
+		}
+		p.imageMode(p.CORNER)
+		p.image(IMAGE.beeFront, 0, 0, 1920, 1080)
+		p.imageMode(p.CENTER)
+		tracker.faces.forEach((face, index) => {
 			if (face.isActive) {
-				p.text("🌻", ...face.nose)
+				let position = this.getScreenPosition(face.nose)
+				p.fill(101.7, 52.9, 68.2)
+				p.noStroke()
+				p.triangle(...position, position.x - 32, 1080, position.x + 32, 1080)
+				switch (index % 3) {
+					case 0:
+						p.image(IMAGE.beeFlowerBlue, ...position)
+						break
+					case 1:
+						p.image(IMAGE.beeFlowerOrange, ...position)
+						break
+					case 2:
+						p.image(IMAGE.beeFlowerRed, ...position)
+						break
+					default:
+						break
+				}
+				p.image(face.thumbnail, ...position, 96, 96)
 			}
 		})
 		tracker.hands.forEach((hand, index) => {
 			if (hand.isActive) {
-				p.text("🐝", ...hand.center)
-				p.text(this.bees[index], ...hand.center)
+				let position = this.getScreenPosition(hand.center)
+				p.image(IMAGE.bee, ...position)
 			}
 		})
-		this.hives.forEach(hive => {
-			p.text(hive.pollen, hive.x, this.hiveRect.y + 64)
-		})
+		p.imageMode(p.CORNER)
+	},
+
+	getScreenPosition(position) {
+		return new Vector2D(position.x * 3, position.y * 2.25)
 	},
 }
