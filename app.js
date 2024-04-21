@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   app.debugOptionsOptions.mode = Object.keys(MODES)
 
   new Vue({
-    template: `<div id="app">
+    template: `<div id="app" @click="enterTetris">
 
     <div id="main-drawing" ref="p5"></div>
     <div id="score">Score: {{score.value}}</div>
@@ -80,7 +80,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
     </div>`,
 
     methods: {
+      enterTetris() {
+        if (this.debugOptions.mode === "start") {
+          console.log("CLICKED TO ENTER TETRIS")
+          this.debugOptions.mode = "tetris"
 
+        }
+      }
 
     },
 
