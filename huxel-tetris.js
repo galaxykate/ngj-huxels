@@ -207,6 +207,9 @@ MODES.tetris = {
 
 		tracker.hands.forEach((hand) => {
 			if (!hand.isActive) return;
+			if (!hand.tetrisColor) {
+				hand.tetrisColor = Math.random() > 0.5 ? RED : BLUE;
+			}
 			const x = Math.floor(hand.center.x / huxelSize[0]);
 			const y = rows - 1 - Math.floor(hand.center.y / huxelSize[1]);
 			// console.log(x, y);
@@ -221,7 +224,11 @@ MODES.tetris = {
 	},
 
 	drawBackground({p, tracker, huxels, time, particles, debugOptions}) {
-		p.background(50, 100, 90)
+		//p.background(50, 100, 90)
+		//console.log(IMAGE.tetrisBackground)
+		if (IMAGE.tetrisBackground) {
+			p.image(IMAGE.tetrisBackground, 0, 0, p.width, p.height);
+		}
 	},
 
 	draw(app) {
@@ -229,9 +236,9 @@ MODES.tetris = {
 		// p.fill(300, 80, 50)
 		p.circle(0, 0, 500)
 
-		this.drawControlGrid(app, {x: 0, y: 0, w: 700, h: 700})
-		this.drawGameArea(app, {x: 700, y: 0, w: this.options.cols * this.options.huxelSize[0], h: this.options.rows * this.options.huxelSize[1]})
-		this.drawDebug(app);
+		this.drawControlGrid(app, {x: 700, y: 200, w: 700, h: 700})
+		this.drawGameArea(app, {x: 300, y: 100, w: this.options.cols * this.options.huxelSize[0], h: this.options.rows * this.options.huxelSize[1]})
+		//this.drawDebug(app);
 	},
 
 	drawDebug({p, tracker, huxels, time, particles, debugOptions}) {
@@ -240,9 +247,9 @@ MODES.tetris = {
 		// p.scale(tracker.scale, tracker.scale);
 		tracker.hands.forEach((hand) => {
 			if (!hand.isActive) return;
-			if (!hand.tetrisColor) {
-				hand.tetrisColor = Math.random() > 0.5 ? RED : BLUE;
-			}
+			// if (!hand.tetrisColor) {
+			// 	hand.tetrisColor = Math.random() > 0.5 ? RED : BLUE;
+			// }
 			p.push();
 			p.fill(139, 100, 100);
 			p.circle(hand.center.x, hand.center.y, 10);
