@@ -21,7 +21,7 @@ let scaleFactor = 0;
 MODES.stickfigure = {
 	start({ p, tracker }) {
 		tracker.scale = 4;
-		timer = new Timer(30000, () => {app.debugOptions.mode = "tetris"})
+		timer = new Timer(30000, () => { app.debugOptions.mode = "tetris" })
 	},
 
 	stop({ }) {
@@ -55,15 +55,17 @@ MODES.stickfigure = {
 		if (isLooking) {
 			if (isMoving) {
 				// Player loses or gets penalized
-
-				p.image(IMAGE.laser, p.width*.15, p.height*.15, p.width*.7, p.height*.7);
-				if (!laserPlaying){
-					SOUND.birdLaser0.play()
+				p.image(IMAGE.laser, p.width * .15, p.height * .15, p.width * .7, p.height * .7);
+				if (!laserPlaying) {
+					SOUND.birdLaser0.play();
+					laserPlaying = true; // Set to true immediately after playing the sound
 				}
 			} else {
-				SOUND.birdLaser0.stop()
+				if (!SOUND.birdLaser0.isPlaying()) {
+					SOUND.birdLaser0.stop();
+					laserPlaying = false; // Set to false immediately after stopping the sound
+				}
 			}
-			laserPlaying = !laserPlaying
 		} else {
 			if (isMoving) {
 				// Player gains points
