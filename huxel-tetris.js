@@ -67,10 +67,11 @@ const BLOCK = {
 
 MODES.tetris = {
 	options: {
-		rows: 20,
+		rows: 15,
 		cols: 5,
 		inputRows: 4,
-		inputCols: 5
+		inputCols: 5,
+		huxelSize: [45, 45]
 	},
 	state: {
 		board: [],
@@ -185,7 +186,6 @@ MODES.tetris = {
 		if (!this.state.active) {
 			this.newActive();
 		}
-		//SOUND.tetris1.play();
 		SOUND.tetris1.play();
 	},
 
@@ -230,7 +230,7 @@ MODES.tetris = {
 		p.circle(0, 0, 500)
 
 		this.drawControlGrid(app, {x: 0, y: 0, w: 700, h: 700})
-		this.drawGameArea(app, {x: 700, y: 0, w: 350, h: 700})
+		this.drawGameArea(app, {x: 700, y: 0, w: this.options.cols * this.options.huxelSize[0], h: this.options.rows * this.options.huxelSize[1]})
 		this.drawDebug(app);
 	},
 
