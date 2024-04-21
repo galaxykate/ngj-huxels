@@ -70,6 +70,9 @@ let SOUND_ASSET_FILES = {
 	"monsterGulp4": "S_Monster_Gulp4.wav",
 	"monsterGulp5": "S_Monster_Gulp5.wav",
 
+	// Window Clean Sounds
+	"windowWipe": "S_Window_WipeLoop.wav",
+
 
 }
 
