@@ -1,7 +1,7 @@
 Vue.component("flag-tracker", {
 	// Track lots of flags for debugging
 	template: `<div>
-		
+
 		<table>
 			<tr v-for="val,k in obj">
 				<td>{{k}}</td>

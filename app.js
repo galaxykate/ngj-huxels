@@ -150,6 +150,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
         // We have a new "p" object representing the sketch
         p.setup = () => {
+          app.debugOptions.mode = "start"
           p.createCanvas(this.$refs.p5.offsetWidth, this.$refs.p5.offsetHeight);
           p.colorMode(p.HSL);
           this.tracker.createCaptureAndInitTracking(p)

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  **/
 
 let timer;
@@ -25,12 +25,14 @@ MODES.start = {
 	},
 
 	drawBackground({ p, tracker, huxels, time, particles, debugOptions }) {
-		p.image(IMAGE.loading, 0, 0, p.width, p.height);
+		if (IMAGE.loading) {
+			p.image(IMAGE.loading, 0, 0, p.width, p.height);
+		}
 	},
 
 	draw({p, tracker, huxels, time, particles, debugOptions}) {
 
 
 	},
-	
+
 }

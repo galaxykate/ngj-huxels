@@ -1,5 +1,5 @@
 /**
- * 
+ *
  **/
 
 let previousKeypoints = [];
@@ -9,8 +9,6 @@ let isMoving = false;
 let danceMusicPlaying = false;
 let laserPlaying = false;
 
-let timer;
-
 let lookTimer = 0;
 const lookDuration = 3000;
 let lastDanceTime = 0; // Timestamp of when the last dance happened
@@ -19,9 +17,10 @@ let score = 0;
 let scaleFactor = 0;
 
 MODES.stickfigure = {
+	timer: null,
 	start({ p, tracker }) {
 		tracker.scale = 4;
-		timer = new Timer(30000, () => { app.debugOptions.mode = "tetris" })
+		this.timer = new Timer(30000, () => { app.debugOptions.mode = "tetris" })
 	},
 
 	stop({ }) {
@@ -29,7 +28,7 @@ MODES.stickfigure = {
 	},
 
 	update({ p, tracker, huxels, time, particles, debugOptions }) {
-		timer.update(time.dt)
+		this.timer.update(time.dt)
 		if (Math.random() > .9) {
 			let x = randInt(0, 10)
 			let y = randInt(0, 10)
