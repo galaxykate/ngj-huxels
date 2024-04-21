@@ -185,10 +185,12 @@ MODES.tetris = {
 		if (!this.state.active) {
 			this.newActive();
 		}
+		//SOUND.tetris1.play();
+		SOUND.tetris1.play();
 	},
 
 	stop({}) {
-
+		SOUND.tetris1.stop();
 	},
 
 	update({p, tracker, huxels, time, particles, debugOptions}) {
@@ -258,7 +260,8 @@ MODES.tetris = {
 
 		const rows = this.options.inputRows - 1;
 		p.push();
-		p.stroke(0, 0, 0);
+		p.stroke(0, 0, 0, 0.1);
+		p.strokeWeight(2);
 		this.state.playerInput.forEach((row, i) => {
 			row.forEach((cell, j) => {
 				if (cell === RED) {
