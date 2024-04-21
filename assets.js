@@ -18,7 +18,15 @@ let IMAGE_ASSET_FILES = {
     "jungle_bg": "jungle_background.png",
     "laser": "02_laser_impact.png",
     "musical_note1": "musical_note1.png",
-    "musical_note2": "musical_note2.png"
+    "musical_note2": "musical_note2.png",
+
+	"bee": "bee.png",
+	"beeClouds": "bee_bg_clouds.png",
+	"beeFront": "bee_bg_front.png",
+	"beeFlowerBlue": "bee_flower_blue.png",
+	"beeFlowerOrange": "bee_flower_orange.png",
+	"beeFlowerRed": "bee_flower_red.png",
+	"beeSun": "bee_sun.png",
 }
 
 let SOUND_ASSET_FILES = {
@@ -69,6 +77,9 @@ let SOUND_ASSET_FILES = {
 	"monsterGulp3": "S_Monster_Gulp3.wav",
 	"monsterGulp4": "S_Monster_Gulp4.wav",
 	"monsterGulp5": "S_Monster_Gulp5.wav",
+
+	// Window Clean Sounds
+	"windowWipe": "S_Window_WipeLoop.wav",
 
 
 }
