@@ -196,6 +196,10 @@ MODES.tetris = {
 	update({p, tracker, huxels, time, particles, debugOptions}) {
 		this.state.updateTimer.update(time.dt);
 		this.updatePlayerInput({p, tracker, huxels, time, particles, debugOptions});
+		if (!SOUND.tetris1.isPlaying()) {
+			const modeKeys = Object.keys(MODES);
+			debugOptions.mode = modeKeys[Math.floor(Math.random() * modeKeys.length)];
+		}
 	},
 
 	updatePlayerInput({p, tracker, huxels, time, particles, debugOptions}) {
