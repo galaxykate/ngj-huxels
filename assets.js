@@ -1,6 +1,6 @@
-/** 
+/**
  * Assets go here
- * 
+ *
  **/
 
 let COLOR = {
@@ -10,6 +10,7 @@ let COLOR = {
 
 let IMAGE_ASSET_FILES = {
 	"deer": "clipart2598461.png",
+	"tetrisBackground": "tetris_human_backdrop.jpg"
 }
 
 let SOUND_ASSET_FILES = {
