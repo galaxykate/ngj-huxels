@@ -48,15 +48,17 @@ h3 {
 }
 
 #score {
-  background-color: hsla(0, 100%, 100%, .9);
-  border: 2px solid magenta;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, .5);
-  position: absolute;
-  top: 0px;
-  left: 0px;
+  position: fixed;
+  bottom: 50px;
+  left: 50px;
+  background-color: rgba(190, 221, 237, 0.7); /* 70% transparency */
+  border: 6px solid #6CB9D6;
+  border-radius: 10px; /* Rounded edges */
+  font-family: 'Bangers', cursive;
+  text-align: center;
   padding: 10px;
-  z-index: 100;
-  border-radius: 10px; /* Rounded corners */
+  color: black; /* Adjust text color as needed */
+  font-size: 24px; /* Adjust font size as needed */
 }
 
 main {

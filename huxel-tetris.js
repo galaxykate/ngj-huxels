@@ -241,7 +241,7 @@ MODES.tetris = {
 		p.circle(0, 0, 500)
 
 		this.drawControlGrid(app, {x: 700, y: 200, w: 700, h: 700})
-		this.drawGameArea(app, {x: 300, y: 100, w: this.options.cols * this.options.huxelSize[0], h: this.options.rows * this.options.huxelSize[1]})
+		this.drawGameArea(app, {x: 210, y: 180, w: this.options.cols * this.options.huxelSize[0], h: this.options.rows * this.options.huxelSize[1]})
 		//this.drawDebug(app);
 	},
 
@@ -293,7 +293,8 @@ MODES.tetris = {
 	drawGameArea({p, tracker, huxels, time, particles, debugOptions}, {x, y, w, h}) {
 		p.push();
 		p.translate(x, y);
-		p.fill(0, 0, 0);
+		p.stroke(0, 0, 0);
+		p.fill(0, 0, 100, 0.3);
 		p.rect(0, 0, w, h);
 		const huxelSize = [w / this.options.cols, h / this.options.rows];
 		const rows = this.options.rows - 1;
