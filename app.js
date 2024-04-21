@@ -29,7 +29,7 @@ let app = {
   }),
   mouse: new DraggableMouse(),
   huxels: [],
-  time:new HeartBeatTime({loopOver: 3}),
+  time:new HeartBeatTime({}),
   debugOptions: {
     speed: 1,
     showTrackerLandmarks: false,
@@ -38,7 +38,8 @@ let app = {
   },
   debugOptionsOptions: {
     mode: ["ignore this"]
-  }
+  },
+  score: 0
 }
 
 
@@ -54,6 +55,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     template: `<div id="app">
 
     <div id="main-drawing" ref="p5"></div>
+    <div id="score">Score: {{score}}</div>
 
     <div class="controls">
       <curve-editor :points="points"  v-if="false" />
@@ -81,7 +83,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     },
 
     computed: {
-    
+
       mode() {
         return MODES[this.debugOptions.mode]
       }
@@ -146,6 +148,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
           p.colorMode(p.HSL);
           this.tracker.createCaptureAndInitTracking(p)
 
+          this.mode.start(app)
+
         };
 
         p.draw = () => {
@@ -175,12 +179,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
 
           // this.huxels.forEach(h => h.draw(app))
-          this.mode.draw(app) 
+          this.mode.draw(app)
 
-          
-          
+
+
           let src = this.tracker.capture
-          
+
           // transparentSlice(clippingMask, this.tracker.capture, x,y, 1)
           p.stroke(320, 100, 50)
           p.noFill()
@@ -189,7 +193,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
           // Update all the thumbnails
           this.tracker.faces.forEach((f,index) => {
             if (f.isActive) {
-              
+
               // Bit of a border
               let x = f.x - 40
               let y = f.y - 20
@@ -219,7 +223,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         };
       }, this.$refs.p5);
 
-       this.mode.start(app)
+
     },
 
     data() {

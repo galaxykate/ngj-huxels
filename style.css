@@ -47,6 +47,18 @@ h3 {
   overflow: hidden;
 }
 
+#score {
+  background-color: hsla(0, 100%, 100%, .9);
+  border: 2px solid magenta;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, .5);
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  padding: 10px;
+  z-index: 100;
+  border-radius: 10px; /* Rounded corners */
+}
+
 main {
   flex: 1; /* To allow main to grow and consume the available space */
 
@@ -75,12 +87,12 @@ button.active {
 
 canvas {
   position: relative;
- 
+
 }
 
 .tools {
   max-width: 300px;
-  
+
   box-shadow: 0px 2px 8px rgba(0, 0, 0, .5);
 }
 
