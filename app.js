@@ -120,8 +120,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
         app.p = p
 
-        let clippingMask = p.createGraphics(app.faceThumbnailSize,app.faceThumbnailSize)
-       
 
         // Make graphics for each face
         this.tracker.faces.forEach(f => {
@@ -135,9 +133,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
           id:"main",
           p})
 
-        // We have a new "p" object representing the sketch
+        p.preload = () => {
+          // Load all images
+          loadImageAssets(p)
+          loadSoundAssets(p)
+        }
 
-        this.capture;
+
+        // We have a new "p" object representing the sketch
         p.setup = () => {
           p.createCanvas(this.$refs.p5.offsetWidth, this.$refs.p5.offsetHeight);
           p.colorMode(p.HSL);
@@ -186,8 +189,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
           // Update all the thumbnails
           this.tracker.faces.forEach((f,index) => {
             if (f.isActive) {
-              p.rect(f.x, f.y, f.w, f.h)
-
+              
               // Bit of a border
               let x = f.x - 40
               let y = f.y - 20
@@ -213,24 +215,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
               makePixelsOutsideCircleTransparent(img, thumbH/2, thumbH/2, thumbH/2)
             }
           })
-
-
-
-          // clippingMask.loadPixels()
-
-
-          // clippingMask.updatePixels()
-
-
-
-          // The clipping mask is W,H
-          // We want to get an image of x
-
-          p.image(clippingMask, 0, 0)
-
-
-         
-
 
         };
       }, this.$refs.p5);
