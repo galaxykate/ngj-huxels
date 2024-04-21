@@ -34,7 +34,7 @@ let app = {
     speed: 1,
     showTrackerLandmarks: false,
     showTrackerCamera: false,
-    mode: "test"
+    mode: "test",
   },
   debugOptionsOptions: {
     mode: ["ignore this"]
