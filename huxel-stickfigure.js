@@ -13,10 +13,11 @@ const lookDuration = 3000;
 let lastDanceTime = 0; // Timestamp of when the last dance happened
 const danceCooldown = 1000; // Cooldown period in milliseconds
 let score = 0;
+let scaleFactor = 0;
 
 MODES.stickfigure = {
 	start({ p }) {
-		
+
 	},
 
 	stop({ }) {
@@ -34,6 +35,7 @@ MODES.stickfigure = {
 
 	drawBackground({ p, tracker, huxels, time, particles, debugOptions }) {
 		p.image(IMAGE.jungle_bg, 0, 0, p.width, p.height);
+		scaleFactor = IMAGE.jungle_bg.width / p.width;
 	},
 
 	draw({ p, tracker, huxels, time, particles, debugOptions }) {
@@ -43,51 +45,62 @@ MODES.stickfigure = {
 		// Draw game elements
 		drawGameMaster(p);
 		drawPlayer(p, tracker);
-	  
+
 		// Game logic
 		if (isLooking) {
-		  if (isMoving) {
-			// Player loses or gets penalized
-			p.fill(0, 100, 50);
-			p.ellipse(100, 100, 100, 100)
-		  }
+			if (isMoving) {
+				// Player loses or gets penalized
+
+				p.image(IMAGE.laser, p.width*.1, p.height*.1, p.width*.8, p.height*.8);
+			}
 		} else {
-		  if (isMoving) {
-			// Player gains points
-			p.fill(320, 100, 50);
-			p.ellipse(100, 100, 300, 300)
-		  }
+			if (isMoving) {
+				// Player gains points
+				drawMusicalNotes(p, tracker, 10);
+
+			}
 		}
 	},
 }
 
 function checkGameMasterState(time) {
 	// Logic to randomly determine if the game master is looking
-    lookTimer += time.dt;
-    if (lookTimer > lookDuration) {
-      // Toggle isLooking state and reset timer
-      isLooking = !isLooking;
-      lookTimer = 0;
+	lookTimer += time.dt;
+	if (lookTimer > lookDuration) {
+		// Toggle isLooking state and reset timer
+		isLooking = !isLooking;
+		lookTimer = 0;
 	}
-  }
+}
 
-  function drawGameMaster(p) {
+function drawGameMaster(p) {
 	let bird_loc_x = 80
 	let bird_loc_y = 20
 
+	let scaledWidth = IMAGE.bird_head.width / scaleFactor;
+	let scaledHeight = IMAGE.bird_head.height / scaleFactor;
+
 	// Draw the game master on the canvas
-	// TODO: SCALE the head!!
-	if (isLooking){	
-		p.image(IMAGE.bird_head, p.width - 2 * bird_loc_x - IMAGE.bird_head.width, bird_loc_y);
+	if (isLooking) {
+		// Position the bird head relative to the right edge of the canvas
+		// The x position is calculated to place the scaled image 'bird_loc_x' pixels from the right edge
+		let xPosition = p.width - bird_loc_x - scaledWidth;
+		p.image(IMAGE.bird_head, xPosition, bird_loc_y, scaledWidth, scaledHeight);
 	} else {
+		// When not looking, flip the image horizontally
 		p.push();
+		// Translate the position to account for the flipped image
+		p.translate(p.width - bird_loc_x, 0);
+		// Apply the scale transformation to flip the image
 		p.scale(-1, 1);
-		p.image(IMAGE.bird_head, -p.width + bird_loc_x, bird_loc_y);
+		// Draw the image at the translated and scaled position
+		// Since we've already translated, we start drawing from (0, bird_loc_y)
+		p.image(IMAGE.bird_head, 0, bird_loc_y, scaledWidth, scaledHeight);
 		p.pop();
 	}
-  }
-  
-  function drawPlayer(p, tracker) {
+}
+
+function drawPlayer(p, tracker) {
 	// Use pose data to draw the player on the canvas
 	tracker.poses.forEach((pose) => {
 		if (pose.isActive) {
@@ -141,7 +154,7 @@ function checkGameMasterState(time) {
 			let PI = 3.14159
 			let leaves = 3; // Number of leaves to draw
 			let angleBetweenLeaves = PI / leaves; // Angle between each leaf
-			
+
 			for (let i = 0; i < leaves; i++) {
 				p.push(); // Save the current drawing state
 				p.translate(head_top.x, head_top.y); // Move the origin to head_top
@@ -189,22 +202,22 @@ function checkGameMasterState(time) {
 				// Check the cooldown before playing the music
 				let timeNow = p.millis();
 				if (movementLevel > 200 && !danceMusicPlaying && timeNow - lastDanceTime > danceCooldown) {
-				  SOUND.stick_dance.play();
-				  danceMusicPlaying = true;
-				} else if (movementLevel <= 200 && danceMusicPlaying) {
-				  SOUND.stick_dance.pause();
-				  danceMusicPlaying = false;
-				  lastDanceTime = timeNow; // Update the timestamp of the last dance
+					SOUND.stick_dance.play();
+					danceMusicPlaying = true;
+				} else if (movementLevel <= 100 && movementLevel != 0 && danceMusicPlaying) {
+					SOUND.stick_dance.pause();
+					danceMusicPlaying = false;
+					lastDanceTime = timeNow; // Update the timestamp of the last dance
 				}
 
-				if (movementLevel > 200 && movementLevel < 600 && !isLooking) {
-					// REWARD!!
+				if (movementLevel > 200 && movementLevel < 600 && isLooking) {
+					// PUNISHMENT!!!!!!!
 					isMoving = true;
-					drawMusicalNotes(p, 3);
-				} else if (movementLevel > 600 && isLooking) {
-					// PUNISHMENT!!
+					app.score.value -= 1;
+				} else if (movementLevel > 600 && !isLooking) {
+					// REWARD!!!
 					isMoving = true;
-					drawMusicalNotes(p, 9);
+					app.score.value += 1;
 				} else {
 					isMoving = false;
 				}
@@ -215,36 +228,38 @@ function checkGameMasterState(time) {
 			});
 		}
 	});
-  }
+}
 
-  function drawMusicalNotes(p, num) {
+function drawMusicalNotes(p, tracker, num) {
 	// Decide how many notes to draw
 	let numberOfNotes = num; // For example, draw 10 notes
 
-	for (let i = 0; i < numberOfNotes; i++) {
-	  // Randomly select one of the two images
-	  let noteImage = [IMAGE.musical_note1, IMAGE.musical_note2];
+	// Loop through each hand detected by the tracker
+	tracker.hands.forEach((hand) => {
+		// Get the hand's position
+		let handX = hand.center.x;
+		let handY = hand.center.y;
 
-	  // Define a "center zone" range around the middle of the canvas
-	  let centerX = p.width / 2;
-	  let centerY = p.height / 2;
-	  let rangeX = p.width * 0.3; // 20% of the canvas width
-	  let rangeY = p.height * 0.3; // 20% of the canvas height
-  
-	  // Random x and y positions within the "center zone"
-	  let x = centerX + p.random(-rangeX, rangeX);
-	  let y = centerY + p.random(-rangeY, rangeY);
+		// Define a "zone" range around the hand position
+		let rangeX = 100; // Range in pixels around the hand's x position
+		let rangeY = 100; // Range in pixels around the hand's y position
 
-	  let randomNum = getRandomInt(2);
-	  
-	  // Draw the note image at the calculated position
-	  p.image(noteImage[randomNum], x, y, 24, 36);
-	}
-  }
+		// Randomly select one of the two images
+		let noteImage = [IMAGE.musical_note1, IMAGE.musical_note2];
+		let randomNum = getRandomInt(2);
 
-  function getRandomInt(max) {
+		// Random x and y positions within the "zone" around the hand
+		let x = handX + p.random(-rangeX, rangeX);
+		let y = handY + p.random(-rangeY, rangeY);
+
+		// Draw the note image at the calculated position
+		p.image(noteImage[randomNum], x, y, 48, 72);
+	});
+}
+
+function getRandomInt(max) {
 	return Math.floor(Math.random() * max);
-  }
+}
 
 function drawTrapezoid(p, topCenter, bottomCenter, topWidth, bottomWidth) {
 	// Calculate the corners of the trapezoid

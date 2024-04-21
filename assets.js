@@ -63,7 +63,6 @@ let SOUND_ASSET_FILES = {
 	"monsterGrab1": "S_Monster_Grab1.wav",
 	"monsterGrab2": "S_Monster_Grab2.wav",
 	"monsterGrab3": "S_Monster_Grab3.wav",
-	"monsterGrab4": "S_Monster_Grab4.wav",
 	"monsterGulp0": "S_Monster_Gulp0.wav",
 	"monsterGulp1": "S_Monster_Gulp1.wav",
 	"monsterGulp2": "S_Monster_Gulp2.wav",
