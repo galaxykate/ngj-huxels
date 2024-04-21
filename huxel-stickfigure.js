@@ -8,6 +8,8 @@ let isLooking = false;
 let isMoving = false;
 let danceMusicPlaying = false;
 
+let timer;
+
 let lookTimer = 0;
 const lookDuration = 3000;
 let lastDanceTime = 0; // Timestamp of when the last dance happened
@@ -17,8 +19,8 @@ let scaleFactor = 0;
 
 MODES.stickfigure = {
 	start({ p, tracker }) {
-		tracker.scale = 3;
-
+		tracker.scale = 4;
+		timer = new Timer(10000, () => {app.debugOptions.mode = "tetris"})
 	},
 
 	stop({ }) {
@@ -26,6 +28,7 @@ MODES.stickfigure = {
 	},
 
 	update({ p, tracker, huxels, time, particles, debugOptions }) {
+		timer.update(time.dt)
 		if (Math.random() > .9) {
 			let x = randInt(0, 10)
 			let y = randInt(0, 10)
@@ -52,7 +55,7 @@ MODES.stickfigure = {
 			if (isMoving) {
 				// Player loses or gets penalized
 
-				p.image(IMAGE.laser, p.width*.1, p.height*.1, p.width*.8, p.height*.8);
+				p.image(IMAGE.laser, p.width*.15, p.height*.15, p.width*.7, p.height*.7);
 			}
 		} else {
 			if (isMoving) {
@@ -205,7 +208,7 @@ function drawPlayer(p, tracker) {
 				if (movementLevel > 200 && !danceMusicPlaying && timeNow - lastDanceTime > danceCooldown) {
 					SOUND.stick_dance.play();
 					danceMusicPlaying = true;
-				} else if (movementLevel <= 100 && movementLevel != 0 && danceMusicPlaying) {
+				} else if (movementLevel <= 200 && movementLevel != 0 && danceMusicPlaying) {
 					SOUND.stick_dance.pause();
 					danceMusicPlaying = false;
 					lastDanceTime = timeNow; // Update the timestamp of the last dance
