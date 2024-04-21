@@ -146,6 +146,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
           p.colorMode(p.HSL);
           this.tracker.createCaptureAndInitTracking(p)
 
+          this.mode.start(app)
+
         };
 
         p.draw = () => {
@@ -219,7 +221,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         };
       }, this.$refs.p5);
 
-       this.mode.start(app)
+   
     },
 
     data() {
