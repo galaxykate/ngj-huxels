@@ -16,7 +16,8 @@ let score = 0;
 let scaleFactor = 0;
 
 MODES.stickfigure = {
-	start({ p }) {
+	start({ p, tracker }) {
+		tracker.scale = 3;
 
 	},
 
