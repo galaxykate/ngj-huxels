@@ -30,6 +30,10 @@ let IMAGE_ASSET_FILES = {
 	"beeFlowerOrange": "bee_flower_orange.png",
 	"beeFlowerRed": "bee_flower_red.png",
 	"beeSun": "bee_sun.png",
+
+	"cleanMirror": "clean_mirror.png",
+	"cleanSponge": "clean_sponge.png",
+	"cleanStar": "clean_star.png",
 }
 
 let SOUND_ASSET_FILES = {
