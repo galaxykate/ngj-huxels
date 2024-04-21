@@ -209,14 +209,16 @@ MODES.tetris = {
 			SOUND[sound].play();
 		}
 		this.state.updateTimer.endTime = this.options.levels[this.state.level].speed;
+		this.state.origScale = tracker.scale;
 		tracker.scale = 2.8;
 	},
 
-	stop({}) {
+	stop({tracker}) {
 		const sound = this.options.levels[this.state.level].sound;
 		if (SOUND[sound]) {
 			SOUND[sound].stop();
 		}
+		tracker.scale = this.state.origScale;
 	},
 
 	update({p, tracker, huxels, time, particles, debugOptions}) {
