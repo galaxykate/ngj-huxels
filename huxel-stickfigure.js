@@ -10,9 +10,9 @@ let danceMusicPlaying = false;
 let laserPlaying = false;
 
 let lookTimer = 0;
-const lookDuration = 3000;
+let lookDuration = 3000;
 let lastDanceTime = 0; // Timestamp of when the last dance happened
-const danceCooldown = 1000; // Cooldown period in milliseconds
+const cooldownTime = 500; // Cooldown period in milliseconds
 let score = 0;
 let scaleFactor = 0;
 
@@ -20,11 +20,13 @@ MODES.stickfigure = {
 	timer: null,
 	start({ p, tracker }) {
 		tracker.scale = 4;
-		this.timer = new Timer(30000, () => { app.debugOptions.mode = "tetris" })
+		this.timer = new Timer(60000, () => { app.debugOptions.mode = "tetris" })
 	},
 
 	stop({ }) {
-		SOUND.stick_dance.stop();
+		if (SOUND.stick_dance.isPlaying()){
+			SOUND.stick_dance.stop();
+		}
 	},
 
 	update({ p, tracker, huxels, time, particles, debugOptions }) {
@@ -53,21 +55,21 @@ MODES.stickfigure = {
 		// Game logic
 		if (isLooking) {
 			if (isMoving) {
-				// Player loses or gets penalized
-				p.image(IMAGE.laser, p.width * .15, p.height * .15, p.width * .7, p.height * .7);
+				app.score.value -= 1;
 				if (!laserPlaying) {
 					SOUND.birdLaser0.play();
 					laserPlaying = true; // Set to true immediately after playing the sound
-				}
-			} else {
-				if (!SOUND.birdLaser0.isPlaying()) {
-					SOUND.birdLaser0.stop();
-					laserPlaying = false; // Set to false immediately after stopping the sound
+
+					// Player loses or gets penalized
+					p.image(IMAGE.laser, p.width * .15, p.height * .15, p.width * .7, p.height * .7);
+				} else {
+					laserPlaying = false;
 				}
 			}
 		} else {
 			if (isMoving) {
 				// Player gains points
+				app.score.value += 1;
 				drawMusicalNotes(p, tracker, 10);
 			}
 		}
@@ -81,6 +83,7 @@ function checkGameMasterState(time) {
 		// Toggle isLooking state and reset timer
 		isLooking = !isLooking;
 		lookTimer = 0;
+		lookDuration = randInt(3000, 5000);
 	}
 }
 
@@ -212,7 +215,7 @@ function drawPlayer(p, tracker) {
 
 				// Check the cooldown before playing the music
 				let timeNow = p.millis();
-				if (movementLevel > 200 && !danceMusicPlaying && timeNow - lastDanceTime > danceCooldown) {
+				if (movementLevel > 200 && !danceMusicPlaying && timeNow - lastDanceTime > cooldownTime) {
 					SOUND.stick_dance.play();
 					danceMusicPlaying = true;
 				} else if (movementLevel <= 200 && movementLevel != 0 && danceMusicPlaying) {
@@ -221,14 +224,12 @@ function drawPlayer(p, tracker) {
 					lastDanceTime = timeNow; // Update the timestamp of the last dance
 				}
 
-				if (movementLevel > 200 && movementLevel < 600 && isLooking) {
+				if (movementLevel > 600 && isLooking) {
 					// PUNISHMENT!!!!!!!
 					isMoving = true;
-					app.score.value -= 1;
-				} else if (movementLevel > 600 && !isLooking) {
+				} else if (movementLevel > 200 && !isLooking) {
 					// REWARD!!!
 					isMoving = true;
-					app.score.value += 1;
 				} else {
 					isMoving = false;
 				}
@@ -242,34 +243,38 @@ function drawPlayer(p, tracker) {
 }
 
 function drawMusicalNotes(p, tracker, num) {
-	// Decide how many notes to draw
-	let numberOfNotes = num; // For example, draw 10 notes
-
 	// Loop through each hand detected by the tracker
 	tracker.hands.forEach((hand) => {
-		// Get the hand's position
-		let handX = hand.center.x;
-		let handY = hand.center.y;
+		if (hand.isActive) {
+			// Get the hand's position
+			let handX = hand.center.x;
+			let handY = hand.center.y;
 
-		// Define a "zone" range around the hand position
-		let rangeX = 100; // Range in pixels around the hand's x position
-		let rangeY = 100; // Range in pixels around the hand's y position
+			// Define a "zone" range around the hand position
+			let rangeX = 200; // Range in pixels around the hand's x position
+			let rangeY = 200; // Range in pixels around the hand's y position
 
-		// Randomly select one of the two images
-		let noteImage = [IMAGE.musical_note1, IMAGE.musical_note2];
-		let randomNum = getRandomInt(2);
+			// Randomly select one of the two images
+			let noteImages = [IMAGE.musical_note1, IMAGE.musical_note2];
 
-		// Random x and y positions within the "zone" around the hand
-		let x = handX + p.random(-rangeX, rangeX);
-		let y = handY + p.random(-rangeY, rangeY);
+			// Loop to draw 'num' number of notes
+			for (let i = 0; i < num; i++) {
+				// Randomly select one of the two images
+				let randomNum = randInt(noteImages.length - 1);
 
-		// Draw the note image at the calculated position
-		p.image(noteImage[randomNum], x, y, 48, 72);
+				// Random x and y positions within the "zone" around the hand
+				let x = handX + p.random(-rangeX, rangeX);
+				let y = handY + p.random(-rangeY, rangeY);
+
+				// Get the selected note image
+				let noteImage = noteImages[randomNum];
+
+				// Draw the note image at the calculated position
+				// Assuming the note image has properties .width and .height for its dimensions
+				p.image(noteImage, x, y, noteImage.width / 5, noteImage.height / 5);
+			}
+		}
 	});
-}
-
-function getRandomInt(max) {
-	return Math.floor(Math.random() * max);
 }
 
 function drawTrapezoid(p, topCenter, bottomCenter, topWidth, bottomWidth) {

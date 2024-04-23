@@ -22,6 +22,10 @@ let IMAGE_ASSET_FILES = {
     "laser": "02_laser_impact.png",
     "musical_note1": "musical_note1.png",
     "musical_note2": "musical_note2.png",
+	"pow": "pow.png",
+	"wow": "wow.png",
+	"nice": "nice.png",
+	"hero": "hero.png",
 
 	"bee": "bee.png",
 	"beeClouds": "bee_bg_clouds.png",
