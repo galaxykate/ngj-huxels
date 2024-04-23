@@ -207,40 +207,52 @@ function drawPlayer(p, tracker) {
 			foot_left.draw(p, 50)
 			foot_right.draw(p, 50)
 
-			let currentKeypoints = pose.landmarks;
-
-			if (previousKeypoints.length > 0) {
-				let movementLevel = calculateMovement(p, previousKeypoints, currentKeypoints);
-				console.log(movementLevel)
-
-				// Check the cooldown before playing the music
-				let timeNow = p.millis();
-				if (movementLevel > 200 && !danceMusicPlaying && timeNow - lastDanceTime > cooldownTime) {
-					SOUND.stick_dance.play();
-					danceMusicPlaying = true;
-				} else if (movementLevel <= 200 && movementLevel != 0 && danceMusicPlaying) {
-					SOUND.stick_dance.pause();
-					danceMusicPlaying = false;
-					lastDanceTime = timeNow; // Update the timestamp of the last dance
-				}
-
-				if (movementLevel > 600 && isLooking) {
-					// PUNISHMENT!!!!!!!
-					isMoving = true;
-				} else if (movementLevel > 200 && !isLooking) {
-					// REWARD!!!
-					isMoving = true;
-				} else {
-					isMoving = false;
-				}
-			}
-
-			previousKeypoints = currentKeypoints.map(kp => {
-				return { ...kp };
-			});
+			processMovement(p, pose);
 		}
 	});
 }
+
+// Function to calculate movement level and update music and movement status
+function processMovement(p, pose) {
+	let currentKeypoints = pose.landmarks;
+  
+	if (previousKeypoints.length > 0) {
+	  let movementLevel = calculateMovement(p, previousKeypoints, currentKeypoints);
+	  console.log(movementLevel);
+	  updateMusicPlayback(p, movementLevel);
+	  updateMovementStatus(movementLevel);
+	}
+  
+	// Update previous keypoints for the next frame
+	previousKeypoints = currentKeypoints.map(kp => ({ ...kp }));
+  }
+  
+  // Function to update music playback based on movement level
+  function updateMusicPlayback(p, movementLevel) {
+	let timeNow = p.millis();
+  
+	if (movementLevel > 200 && !danceMusicPlaying && timeNow - lastDanceTime > cooldownTime) {
+	  SOUND.stick_dance.play();
+	  danceMusicPlaying = true;
+	} else if (movementLevel <= 200 && movementLevel != 0 && danceMusicPlaying) {
+	  SOUND.stick_dance.pause();
+	  danceMusicPlaying = false;
+	  lastDanceTime = timeNow; // Update the timestamp of the last dance
+	}
+  }
+  
+  // Function to update movement status based on movement level
+  function updateMovementStatus(movementLevel) {
+	if (movementLevel > 600 && isLooking) {
+	  // PUNISHMENT!!!!!!!
+	  isMoving = true;
+	} else if (movementLevel > 200 && !isLooking) {
+	  // REWARD!!!
+	  isMoving = true;
+	} else {
+	  isMoving = false;
+	}
+  }
 
 function drawMusicalNotes(p, tracker, num) {
 	// Loop through each hand detected by the tracker
