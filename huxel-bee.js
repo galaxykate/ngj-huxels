@@ -17,7 +17,7 @@ MODES.bee = {
 			this.flowers.push(Array.from(beeMax))
 		})
 		SOUND.beeAmbience.play()
-		SOUND.beeAmbience.setVolume(0.1)
+		SOUND.beeAmbience.setVolume(0.5)
 	},
 
 	stop({p, tracker, huxels, time, particles, debugOptions}) {
@@ -31,9 +31,6 @@ MODES.bee = {
 	},
 
 	update({p, tracker, huxels, time, particles, debugOptions}) {
-		if (!SOUND.beeAmbience.isPlaying()) {
-			debugOptions.mode = "tetris"
-		}
 		let beeActive = false
 		let isPollinating = false
 		tracker.hands.forEach((hand, index) => {
@@ -44,11 +41,11 @@ MODES.bee = {
 				for (let index2 = 0; index2 < tracker.faces.length; index2++) {
 					let face = tracker.faces[index2]
 					if (face.isActive && Vector2D.distance(position, this.getScreenPosition(face.nose)) < 160) {
-						let pollen = Math.min(time.dt, 500 - this.bees[index], this.flowers[index2][index])
-						this.bees[index] += pollen
-						this.flowers[index2][index] -= pollen
+						let nectar = Math.min(time.dt, 500 - this.bees[index], this.flowers[index2][index])
+						this.bees[index] += nectar
+						this.flowers[index2][index] -= nectar
 						foundFlower = true
-						if (pollen > 0) {
+						if (nectar > 0) {
 							isPollinating = true
 							if (Math.min(500 - this.bees[index], this.flowers[index2][index]) <= 0) {
 								SOUND.beePollinateEnd.play()
@@ -102,29 +99,32 @@ MODES.bee = {
 		} else if (!isPollinating) {
 			SOUND.beePollinateLoop.stop()
 		}
+		if (!SOUND.beeAmbience.isPlaying()) {
+			debugOptions.mode = "tetris"
+		}
 	},
 
 	drawBackground({p, tracker, huxels, time, particles, debugOptions}) {
-		p.image(IMAGE.beeClouds, 0, 0, 1920, 1080)
+		p.image(IMAGE.beeClouds, 0, 0, p.width, p.height)
 	},
 
 	draw({p, tracker, huxels, time, particles, debugOptions}) {
 		p.imageMode(p.CENTER)
 		p.image(IMAGE.beeSun, 480, 240)
-		if (tracker.faces[0].isActive) {
-			p.tint(48, 100, 50)
-			p.image(tracker.faces[0].thumbnail, 480, 230, 240, 240)
-			p.noTint()
-		}
+		p.tint(48, 100, 50)
+		p.image(tracker.faces[0].thumbnail, 480, 230, 240, 240)
+		p.noTint()
 		p.imageMode(p.CORNER)
-		p.image(IMAGE.beeFront, 0, 0, 1920, 1080)
+		p.image(IMAGE.beeFront, 0, 0, p.width, p.height)
 		p.imageMode(p.CENTER)
 		tracker.faces.forEach((face, index) => {
 			if (face.isActive) {
 				let position = this.getScreenPosition(face.nose)
-				p.fill(101.7, 52.9, 68.2)
+				p.fill(83.48, 42.59, 57.65)
 				p.noStroke()
-				p.triangle(...position, position.x - 32, 1080, position.x + 32, 1080)
+				p.triangle(...position, position.x - 32, p.height, position.x + 32, p.height)
+				p.image(IMAGE.leaf, position.x - 50, position.y + (p.height - position.y) * 0.4, 100, 42)
+				p.image(IMAGE.leaf, position.x + 50, position.y + (p.height - position.y) * 0.5, 100, 42)
 				switch (index % 3) {
 					case 0:
 						p.image(IMAGE.beeFlowerBlue, ...position)
