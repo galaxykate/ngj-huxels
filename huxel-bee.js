@@ -3,6 +3,7 @@ MODES.bee = {
 	flowers: [],
 	hives: [110, 1550],
 	hiveRect: {y: 400, width: 270, height: 320},
+	countdown: 0,
 
 	start({p, tracker, huxels, time, particles, debugOptions}) {
 		tracker.scale = 2
@@ -18,6 +19,7 @@ MODES.bee = {
 		})
 		SOUND.beeAmbience.play()
 		SOUND.beeAmbience.setVolume(0.5)
+		this.countdown = 30000
 	},
 
 	stop({p, tracker, huxels, time, particles, debugOptions}) {
@@ -99,7 +101,8 @@ MODES.bee = {
 		} else if (!isPollinating) {
 			SOUND.beePollinateLoop.stop()
 		}
-		if (!SOUND.beeAmbience.isPlaying()) {
+		this.countdown -= time.dt
+		if (this.countdown <= 0) {
 			debugOptions.mode = "tetris"
 		}
 	},
